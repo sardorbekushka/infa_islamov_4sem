@@ -4,7 +4,7 @@ import numpy as np
 
 gmsh.initialize()
 
-gmsh.model.add("thor")
+gmsh.model.add("torus")
 
 # радиус тора
 r1 = 1
@@ -28,7 +28,7 @@ gmsh.option.setNumber("Mesh.MeshSizeFromCurvature", 50)
 
 gmsh.model.mesh.generate(3)
 
-gmsh.write("thor.msh")
+gmsh.write("torus.msh")
 
 if '-nopopup' not in sys.argv:
     gmsh.fltk.run()
