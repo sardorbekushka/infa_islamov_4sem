@@ -69,7 +69,7 @@ class RotateMesh(CalcMesh):
         self.velocity[1] = self.omega * self.nodes[0]
 
 
-class EatMesh(CalcMesh):
+class ConvulseMesh(CalcMesh):
     def __init__(self, nodes_coords, tetrs_points):
         super().__init__(nodes_coords, tetrs_points)
         # self.maxz = max(self.nodes[2]) * 0.9
