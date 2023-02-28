@@ -8,4 +8,5 @@
 * [**Frad explodes**](https://youtu.be/RhjlXyjD31U)
 
 **lab3 (FEniCSx)**
-* [**Fred's aerodynamic**](https://www.youtube.com/watch?v=B29gHbTuGYo&list=PLh0dLzIF_Wfczf_OldBakDzfDqbLyXtIM&index=4)
+* [**Fred's aerodynamic (pressure)**](https://youtu.be/B29gHbTuGYo)
+* [**Fred's aerodynamic (velocity)**](https://youtu.be/XSIdefUJJ98)
