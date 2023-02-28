@@ -92,7 +92,7 @@ A3 = assemble(a3)
 [bc.apply(A2) for bc in bcp]
 
 # VTK files for visualization
-# file_u = File('navier_stokes_frog/velocity.pvd')
+file_u = File('navier_stokes_frog/velocity.pvd')
 file_p = File('navier_stokes_frog/pressure.pvd')
 
 File('navier_stokes_frog/frog.xml.gz') << mesh
@@ -119,7 +119,7 @@ for n in range(num_steps):
     solve(A3, u_.vector(), b3, 'cg', 'sor')
 
     # Save solution to file (XDMF/HDF5)
-    # file_u << u_
+    file_u << u_
     file_p << p_
 
     # Update previous solution
