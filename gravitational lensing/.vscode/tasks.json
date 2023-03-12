@@ -1,0 +1,37 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++ сборка активного файла",
+            "command": "/usr/bin/g++",
+            "args": [
+                "-std=c++17",
+                "-fdiagnostics-color=always",
+                "-g",
+                "-I/opt/local/include/",
+                "/opt/local/lib/libsfml-graphics.dylib",
+                "/opt/local/lib/libsfml-audio.dylib",
+                "/opt/local/lib/libsfml-window.dylib",
+                "/opt/local/lib/libsfml-system.dylib",
+                "-O3", 
+                "-lgsl", 
+                "-lcblas", 
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Задача создана отладчиком."
+        }
+    ],
+    "version": "2.0.0"
+}
