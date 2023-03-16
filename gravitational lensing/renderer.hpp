@@ -6,7 +6,8 @@
 #include <iostream>
 #include <string.h>
 #include <SFML/Graphics.hpp>
-#include "lensSolver.hpp"
+// #include "lensSolver.hpp"
+#include "pointLensSolver.hpp"
 
 
 template <typename T>
@@ -18,6 +19,7 @@ private:
 	sf::Image image;
     unsigned width, height;
     LensSolver<T> *solver = nullptr;
+	double scale;
 
     /** 
 	 * Maps some value to the RGBA colorscheme.
@@ -39,6 +41,7 @@ private:
     void setPixelColor(int x, int y, sf::Color color) {
         // if (x < 0 || x > width || y < 0 || y > height)
             // return;
+		// image.setPixel(x, y, color + image.getPixel(x, y));
 		image.setPixel(x, y, color);
 	}
 
@@ -52,7 +55,8 @@ private:
     void mouseHandle() {
 		sf::Vector2i posPixel = sf::Mouse::getPosition(window);
 		sf::Vector2f pos = window.mapPixelToCoords(posPixel);
-		solver->setLensCenter(-(T)pos.x, -(T)pos.y);
+		solver->setLensCenter((T)pos.x * scale, (T)pos.y * scale);
+		// std::cout << pos.
 		// solver->setLensCenter(-(T)pos.x + (T)width / 2, -(T)pos.y + (T)height / 2);
 	}
 
@@ -92,7 +96,7 @@ public:
 	 * @param fractal pointer to object of Fractal (or its subclass) type
      * @param title title of the window (unnecessary)
 	*/
-    Renderer(LensSolver<T> *solver, std::string filename, std::string title): solver(solver)
+    Renderer(LensSolver<T> *solver , std::string filename, std::string title): solver(solver)
 	//  , height(HEIGHT), width(WIDTH), 
                                                     //  window(sf::VideoMode(WIDTH, HEIGHT), title) {
                                                     //  pixels(new sf::Uint8[WIDTH * HEIGHT * 4]), scale_param(1) {
@@ -109,6 +113,10 @@ public:
         }
 		height = source.getSize().y;
 		width = source.getSize().x;
+		// scale = solver->getEinstainAngle() / height * 8;
+		scale = 1e-7;
+		solver->setLensCenter(width / 2 * scale, height / 2 * scale);
+		// std::cout << scale << std::endl;
 		window.create(sf::VideoMode(width, height), title);
     }
 
@@ -119,6 +127,9 @@ public:
      * Sets all pixels' colors.
     */
     void processImage() {
+		// image.copy(sf::Image(image.getSize().x, image.getSize().y, sf::Color::Black));
+		image.create(image.getSize().x, image.getSize().y);
+		// image.loadFromFile("resources/galaxy.jpg");
 		for (unsigned y = 0; y < height; y++)
             for (unsigned x = 0; x < width; x++)
                 processPoint(x, y);
@@ -129,19 +140,33 @@ public:
     */
     void processPoint(unsigned x, unsigned y) {
 		// std::cout << x << std::endl;
-        std::array<Point<T>, 2> imagePositions = solver->processPoint((T)x, (T)y);
+		// std::array<double, 2> &magnification = {1, 1};
+		double magnification[2] {1, 1};
+        std::array<Point<T>, 2> imagePositions = solver->processPoint((T)x * scale, (T)y * scale, magnification);
         // auto imagePos1 = imagePositions[0];
         // auto imagePos2 = imagePositions[1];
 		// for (auto p = imagePositions.begin(); p != imagePositions.end(), ++p) {
-
+		// std::cout << "ok" << std::endl;
+		auto color = getSourceColor(x, y);
 		for (int i = 0; i < 2; i++) {
-			auto p = imagePositions[i];
-			if (!checkPoint(p.x, p.y)) 
+			auto p = imagePositions[i] / scale;
+			auto m = magnification[i];
+			// получилось так что первая точка не меняется а вторая выходит за пределы. типа
+			// 524 524 296 296
+			// -1888 524 -984 296
+			if (!checkPoint(p.x, p.y)) 							
 				return;
-			unsigned x_ = (unsigned)std::ceil(p.x);
-			unsigned y_ = (unsigned)std::ceil(p.y);
-			setPixelColor(x_, y_, getSourceColor(x_, y_));
+			unsigned x_ = (unsigned)std::round(p.x);
+			unsigned y_ = (unsigned)std::round(p.y);
+			sf::Color deltaColor(color.r * (m - 1), color.g * (m - 1), color.b * (m - 1));
+			setPixelColor(x_, y_, color + deltaColor);
+			// if (std::abs((double)x - width / 2) < 2 && std::abs((double)y - height/2) < 2) 
+				// std::cout << m << std::endl;
+				// std::cout << x_ << ' ' << x << ' ' << y_ << ' ' << y << '\n'; 
+			// if (x < 2 && y < 2)
+			// setPixelColor(x_, y_, sf::Color(255, 255, 255));
 		}
+		
 		
 
 		// for (auto &p : imagePositions) {
@@ -173,8 +198,8 @@ public:
         sf::Texture texture;
         texture.create(width, height);
         sf::Sprite sprite;
-
-		processImage();
+		// sprite.setScale
+		// processImage();
 
 		// auto startTime = std::time(nullptr);
 		// auto currentTime = time(nullptr);
@@ -205,8 +230,9 @@ public:
 
             window.clear();
 
-            texture.loadFromImage(image);
-
+            // processImage();
+            // texture.loadFromImage(image);
+			texture.update(image);
             sprite.setTexture(texture);
             window.draw(sprite);
 
