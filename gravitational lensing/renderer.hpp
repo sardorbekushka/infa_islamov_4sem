@@ -38,7 +38,7 @@ private:
 	 * @param y vertical coordinate of pixel.
 	 * @param t the value which will be mapped to the color (depends on iterations number).
 	*/
-    void setPixelColor(int x, int y, sf::Color color) {
+    void setPixelColor(double x, double y, sf::Color color) {
         // if (x < 0 || x > width || y < 0 || y > height)
             // return;
 		// image.setPixel(x, y, color + image.getPixel(x, y));
@@ -63,31 +63,32 @@ private:
 	/**
 	 * Handles keyboard events. It can move the center of view, change max iterations count, rescale the view and reset settings. 
 	*/
-    /*void keyboardHandle(sf::Event event) {
-		double k = 0.2 * fractal->getStartScale();
-        
+    void keyboardHandle(sf::Event event) {
+		auto delta = 2 * scale;
 		if (event.key.code == sf::Keyboard::Right)
-			fractal->updateCenterX(-k);
+			solver->moveLens(delta, 0);
 		else if (event.key.code == sf::Keyboard::Left)
-			fractal->updateCenterX(k);
+			solver->moveLens(-delta, 0);
+
 		if (event.key.code == sf::Keyboard::Up)
-			fractal->updateCenterY(k);
+			solver->moveLens(0, -delta);
 		else if (event.key.code == sf::Keyboard::Down)
-			fractal->updateCenterY(-k);
+			solver->moveLens(0, delta);
 
-		if (event.key.code == sf::Keyboard::Equal)
-			fractal->updateMaxIterations(10);
-		else if (event.key.code == sf::Keyboard::Backspace)
-			fractal->updateMaxIterations(-10);
 
-		if (event.key.code == sf::Keyboard::Enter)
-			fractal->rescale(scale_param);
-		else if (event.key.code == sf::Keyboard::RShift)
-			fractal->rescale(1 / scale_param);
+	// 	if (event.key.code == sf::Keyboard::Equal)
+	// 		fractal->updateMaxIterations(10);
+	// 	else if (event.key.code == sf::Keyboard::Backspace)
+	// 		fractal->updateMaxIterations(-10);
 
-		if (event.key.code == sf::Keyboard::Escape)
-            fractal->reset();
-	}*/
+	// 	if (event.key.code == sf::Keyboard::Enter)
+	// 		fractal->rescale(scale_param);
+	// 	else if (event.key.code == sf::Keyboard::RShift)
+	// 		fractal->rescale(1 / scale_param);
+
+	// 	if (event.key.code == sf::Keyboard::Escape)
+    //         fractal->reset();
+	}
 
 public: 
     /**
@@ -156,10 +157,15 @@ public:
 			// -1888 524 -984 296
 			if (!checkPoint(p.x, p.y)) 							
 				return;
-			unsigned x_ = (unsigned)std::round(p.x);
-			unsigned y_ = (unsigned)std::round(p.y);
 			sf::Color deltaColor(color.r * (m - 1), color.g * (m - 1), color.b * (m - 1));
-			setPixelColor(x_, y_, color + deltaColor);
+			// unsigned x_ = (unsigned)std::ceil(p.x);
+			// unsigned y_ = (unsigned)std::ceil(p.y);
+			// setPixelColor(x_, y_, color + deltaColor);
+			setPixelColor(p.x, p.y, color + deltaColor);
+
+			// x_ += 1;
+			// y_ += 1;
+			// setPixelColor(x_, y_, color + deltaColor);
 			// if (std::abs((double)x - width / 2) < 2 && std::abs((double)y - height/2) < 2) 
 				// std::cout << m << std::endl;
 				// std::cout << x_ << ' ' << x << ' ' << y_ << ' ' << y << '\n'; 
@@ -197,6 +203,8 @@ public:
 
         sf::Texture texture;
         texture.create(width, height);
+		texture.setSmooth(true);
+		// texture.setRepeated(true);
         sf::Sprite sprite;
 		// sprite.setScale
 		// processImage();
@@ -216,11 +224,11 @@ public:
 			{
 				if (event.type == sf::Event::Closed)
 					window.close();
-				// else if (event.type == sf::Event::KeyPressed)
-				// {
-					// keyboardHandle(event);
-                    // setPixels();
-				// }
+				else if (event.type == sf::Event::KeyPressed)
+				{
+					keyboardHandle(event);
+                    processImage();
+				}
 
                 else if (sf::Mouse::isButtonPressed(sf::Mouse::Left)){
 					mouseHandle();
@@ -233,6 +241,8 @@ public:
             // processImage();
             // texture.loadFromImage(image);
 			texture.update(image);
+			// texture.setSmooth(true);
+
             sprite.setTexture(texture);
             window.draw(sprite);
 
