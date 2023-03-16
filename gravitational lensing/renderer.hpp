@@ -6,8 +6,8 @@
 #include <iostream>
 #include <string.h>
 #include <SFML/Graphics.hpp>
-// #include "lensSolver.hpp"
-#include "pointLensSolver.hpp"
+#include "lensSolver.hpp"
+// #include "pointLensSolver.hpp"
 
 
 template <typename T>
