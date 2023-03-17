@@ -75,10 +75,12 @@ private:
 		else if (event.key.code == sf::Keyboard::Down)
 			solver->moveLens(0, delta);
 
-
-	// 	if (event.key.code == sf::Keyboard::Equal)
+		double k = 0.1;
+		if (event.key.code == sf::Keyboard::Equal)
+			solver->updateMass(k);
 	// 		fractal->updateMaxIterations(10);
-	// 	else if (event.key.code == sf::Keyboard::Backspace)
+		else if (event.key.code == sf::Keyboard::Backspace)
+			solver->updateMass(-k);
 	// 		fractal->updateMaxIterations(-10);
 
 	// 	if (event.key.code == sf::Keyboard::Enter)
@@ -130,10 +132,28 @@ public:
     void processImage() {
 		// image.copy(sf::Image(image.getSize().x, image.getSize().y, sf::Color::Black));
 		image.create(image.getSize().x, image.getSize().y);
+
 		// image.loadFromFile("resources/galaxy.jpg");
 		for (unsigned y = 0; y < height; y++)
             for (unsigned x = 0; x < width; x++)
                 processPoint(x, y);
+				
+
+		auto e = solver->getEinstainAngle() / scale;
+		auto center = solver->getLensCenter() / scale;
+		// for 
+
+		// for 
+		// std::cout << e << ' ' << center.x << std::endl;
+		// for (double y = -e-10 ; y < e+10; y++)
+		// 	for (double x = -e-10 ; x < e+10; x++)
+		// 		// if (std::abs(std::pow(x, 2) + std::pow(y, 2) - std::pow(e, 2)) < 1000)
+		// 		if (checkPoint(center.x + x, center.y + y))
+		// 			if (image.getPixel(center.x + x, center.y + y) == sf::Color::Black)
+		// 				// image.setPixel(x, y, sf::Color::White);
+		// 				image.setPixel(center.x + x, center.y + y, sf::Color(255, 255, 255, 255-std::abs(std::pow(x, 2) + std::pow(y, 2) - std::pow(e, 2))/4));
+			
+			
     }
 
     /**
@@ -162,6 +182,10 @@ public:
 			// unsigned y_ = (unsigned)std::ceil(p.y);
 			// setPixelColor(x_, y_, color + deltaColor);
 			setPixelColor(p.x, p.y, color + deltaColor);
+			setPixelColor(p.x, p.y + 1, color + deltaColor);
+			setPixelColor(p.x, p.y - 1, color + deltaColor);
+			setPixelColor(p.x + 1, p.y, color + deltaColor);
+			setPixelColor(p.x - 1, p.y, color + deltaColor);
 
 			// x_ += 1;
 			// y_ += 1;

@@ -82,7 +82,16 @@ public:
         // std::cout << "lens: " << lens.center.x << ' ' << lens.center.y << std::endl;
     }
 
+    Point<T> getLensCenter() {
+        return lens.center;
+    }
+
     double getEinstainAngle() {
         return einstAngle;
+    }
+
+    void updateMass(double k) {
+        lens.mass *= std::pow(10, k);
+        einstAngle *= std::pow(10, (double)k / 2);
     }
 };
