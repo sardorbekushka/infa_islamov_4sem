@@ -32,7 +32,7 @@ protected:
     double magnification(double angle) {
         // auto beta2 = std::pow(beta, 2);
         // return (beta2 + 2) / (2 * beta * std::sqrt(beta2 + 4)) + 0.5
-        return 1 / (1 - 1 / std::pow(angle / einstAngle, 4));
+        return 1 / (1 - std::pow(angle / einstAngle, -4));
     }
 
 public:
@@ -69,8 +69,24 @@ public:
         return imagePositions;
     }
 
+    Point<T> reverseProcessPoint(Point<T> p, double &magn) {
+        auto dp = p - lens.center;
+        // auto theta = std::sqrt(dp * dp);
+        auto theta = dp.norm();
+        auto beta = (dp * dp - einstAngle * einstAngle) / theta;
+        magn = std::abs(magnification(theta));
+        // std::cout << theta << ' ' << magn << std::endl;
+        // double angle = (beta + std::sqrt(beta * beta + 4 * std::pow(einstAngle, 2))) / 2;
+        // magn = magnification(angle);
+        return dp / theta * beta + lens.center;
+    }
+
     std::array<Point<T>, 2> processPoint(T x, T y, double *magn) {
         return processPoint(Point<T>(x, y), magn);
+    }
+
+    Point<T> reverseProcessPoint(T x, T y, double &magn) {
+        return reverseProcessPoint(Point<T>(x, y), magn);
     }
 
     void moveLens(T dx, T dy) {
@@ -90,8 +106,20 @@ public:
         return einstAngle;
     }
 
+    double getMass() {
+        return lens.mass;
+    }
+
+    double getLensRedshift() {
+        return lens.z;
+    }
+
     void updateMass(double k) {
         lens.mass *= std::pow(10, k);
         einstAngle *= std::pow(10, (double)k / 2);
+    }
+
+    double getSourceRedshift() {
+        return source.z;
     }
 };

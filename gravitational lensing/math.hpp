@@ -70,4 +70,8 @@ struct Point {
         *this = *this / denominator;
         return *this;
     }
+
+    T norm() {
+        return std::sqrt(x * x + y * y);
+    }
 };

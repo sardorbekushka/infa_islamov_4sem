@@ -64,7 +64,7 @@ private:
 	 * Handles keyboard events. It can move the center of view, change max iterations count, rescale the view and reset settings. 
 	*/
     void keyboardHandle(sf::Event event) {
-		auto delta = 2 * scale;
+		auto delta = 5 * scale;
 		if (event.key.code == sf::Keyboard::Right)
 			solver->moveLens(delta, 0);
 		else if (event.key.code == sf::Keyboard::Left)
@@ -117,7 +117,7 @@ public:
 		height = source.getSize().y;
 		width = source.getSize().x;
 		// scale = solver->getEinstainAngle() / height * 8;
-		scale = 1e-7;
+		scale = 3e-2;
 		solver->setLensCenter(width / 2 * scale, height / 2 * scale);
 		// std::cout << scale << std::endl;
 		window.create(sf::VideoMode(width, height), title);
@@ -139,23 +139,54 @@ public:
                 processPoint(x, y);
 				
 
-		auto e = solver->getEinstainAngle() / scale;
-		auto center = solver->getLensCenter() / scale;
+		// auto e = solver->getEinstainAngle() / scale;
+		// auto center = solver->getLensCenter() / scale;
 		// for 
 
 		// for 
 		// std::cout << e << ' ' << center.x << std::endl;
 		// for (double y = -e-10 ; y < e+10; y++)
 		// 	for (double x = -e-10 ; x < e+10; x++)
-		// 		// if (std::abs(std::pow(x, 2) + std::pow(y, 2) - std::pow(e, 2)) < 1000)
-		// 		if (checkPoint(center.x + x, center.y + y))
-		// 			if (image.getPixel(center.x + x, center.y + y) == sf::Color::Black)
-		// 				// image.setPixel(x, y, sf::Color::White);
-		// 				image.setPixel(center.x + x, center.y + y, sf::Color(255, 255, 255, 255-std::abs(std::pow(x, 2) + std::pow(y, 2) - std::pow(e, 2))/4));
-			
-			
+		// 		if (std::abs(std::pow(x, 2) + std::pow(y, 2) - std::pow(e, 2)) < 1000)
+		// 			if (checkPoint(center.x + x, center.y + y)){
+		// 				auto k = 255-std::abs(std::pow(x, 2) + std::pow(y, 2) - std::pow(e, 2)) / 4;
+		// 										image.setPixel(center.x + x, center.y + y, image.getPixel(center.x + x, center.y + y) + sf::Color(k, k, k));
+
+		// 			}
+					// if (image.getPixel(center.x + x, center.y + y) == sf::Color::Black)
+						// image.setPixel(x, y, sf::Color::White);
     }
 
+	void reverseProcessImage() {
+		image.create(image.getSize().x, image.getSize().y);
+		for (unsigned y = 0; y < height; y++)
+			for (unsigned x = 0; x < width; x++) 
+				reverseProcessPoint(x, y);
+	}
+
+	void reverseProcessPoint(unsigned x, unsigned y) {
+
+		double magnification = 1.0;
+		double &m = magnification;
+		auto p = solver->reverseProcessPoint(x * scale, y * scale, m) / scale;
+		// if ((p - Point<double>(500, 200)) * (p - Point<double>(500, 200)) < 10)
+			// std::cout << p.x << ' ' << x << std::endl;
+		if (!checkPoint(p.x, p.y))
+			return;
+		auto color = getSourceColor(p.x, p.y);
+		
+		auto r = (color.r * m) > 255 ? 255 : color.r * m;
+		auto g = (color.g * m) > 255 ? 255 : color.g * m;
+		auto b = (color.b * m) > 255 ? 255 : color.b * m;
+		// sf::Color newColor(color.r,)
+		// sf::Color deltaColor(color.r * (m - 1), color.g * (m - 1), color.b * (m - 1));
+		// std::cout << color.toInteger() << ' ' << deltaColor.toInteger() << std::endl;
+		// setPixelColor(x, y, color + deltaColor);
+		setPixelColor(x, y, sf::Color(r, g, b));
+		// auto col = ((int)color.toInteger() * m > 4294967295) ? 4294967295 : color.toInteger() * m;
+		// setPixelColor(x, y, sf::Color(color.toInteger()));
+		// setPixelColor(x, y, sf::Color(color.r * m, color.g * m, color.b * m));
+	}
     /**
      * Sets color of pixel with (x, y) coordinates.
     */
@@ -251,12 +282,14 @@ public:
 				else if (event.type == sf::Event::KeyPressed)
 				{
 					keyboardHandle(event);
-                    processImage();
+                    reverseProcessImage();
+                    // processImage();
 				}
 
                 else if (sf::Mouse::isButtonPressed(sf::Mouse::Left)){
 					mouseHandle();
-                    processImage();
+                    reverseProcessImage();
+                    // processImage();
 				}
 			}
 

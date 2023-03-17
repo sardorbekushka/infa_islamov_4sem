@@ -5,10 +5,12 @@
 #include "renderer.hpp"
 
 int main() {
-    auto solver = new LensSolver<double>(2e31, 0.5, 1.0, 0.0, 0.0);
+    auto solver = new LensSolver<double>(2e41, 0.5, 1.0, 0.0, 0.0);
 	Renderer<double> renderer(solver, "resources/Milky-Way.png");
 	// Renderer<double> renderer(solver, "resources/original.png");
 	// Renderer<double> renderer(solver, "resources/galaxy.jpg");
+	// Renderer<double> renderer(solver, "resources/dark-image.jpg");
+	// Renderer<double> renderer(solver, "resources/space.jpeg");
 	// Renderer<double> renderer(solver, "resources/Milky Way galaxy as seen from Australia.jpg");
 
 	int code = renderer.poll();
