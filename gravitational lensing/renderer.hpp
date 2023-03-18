@@ -38,10 +38,25 @@ private:
 	 * @param y vertical coordinate of pixel.
 	 * @param t the value which will be mapped to the color (depends on iterations number).
 	*/
-    void setPixelColor(double x, double y, sf::Color color) {
+    void setPixelColor(double x, double y, sf::Color color, double m) {
         // if (x < 0 || x > width || y < 0 || y > height)
             // return;
 		// image.setPixel(x, y, color + image.getPixel(x, y));
+		if (m > 2) m = 2;
+
+		// auto r = (color.r * m > 255) ? 255 : color.r * m;
+		// auto g = (color.g * m > 255) ? 255 : color.g * m;
+		// auto b = (color.b * m > 255) ? 255 : color.b * m;
+
+		// color.r = (color.r *= m > 255) ? 255 : 100;
+		// color.g = (color.g *= m > 255) ? 255 : 50;
+		// color.b = (color.b *= m > 255) ? 255 : 50;
+
+		// if (color.r *= m > 255) color.r = 255;
+		// if (color.g *= m > 255) color.g = 255;
+		// if (color.b *= m > 255) color.b = 255;
+		// image.setPixel(x, y, sf::Color(r, g, b));
+		// image.setPixel(x, y, sf::Color::Magenta);
 		image.setPixel(x, y, color);
 	}
 
@@ -79,8 +94,10 @@ private:
 		if (event.key.code == sf::Keyboard::Equal)
 			solver->updateMass(k);
 	// 		fractal->updateMaxIterations(10);
-		else if (event.key.code == sf::Keyboard::Backspace)
+		else if (event.key.code == sf::Keyboard::BackSpace)
 			solver->updateMass(-k);
+
+		// std::cout << event.key.code << std::endl;
 	// 		fractal->updateMaxIterations(-10);
 
 	// 	if (event.key.code == sf::Keyboard::Enter)
@@ -175,14 +192,18 @@ public:
 			return;
 		auto color = getSourceColor(p.x, p.y);
 		
-		auto r = (color.r * m) > 255 ? 255 : color.r * m;
-		auto g = (color.g * m) > 255 ? 255 : color.g * m;
-		auto b = (color.b * m) > 255 ? 255 : color.b * m;
+		
+		setPixelColor(x, y, color, m);
+
+		// sf::Color deltaColor(color.r * (m - 1), color.g * (m - 1), color.b * (m - 1));
+			// unsigned x_ = (unsigned)std::ceil(p.x);
+			// unsigned y_ = (unsigned)std::ceil(p.y);
+			// setPixelColor(x_, y_, color + deltaColor);
+		// setPixelColor(x, y, color + deltaColor);
 		// sf::Color newColor(color.r,)
 		// sf::Color deltaColor(color.r * (m - 1), color.g * (m - 1), color.b * (m - 1));
 		// std::cout << color.toInteger() << ' ' << deltaColor.toInteger() << std::endl;
 		// setPixelColor(x, y, color + deltaColor);
-		setPixelColor(x, y, sf::Color(r, g, b));
 		// auto col = ((int)color.toInteger() * m > 4294967295) ? 4294967295 : color.toInteger() * m;
 		// setPixelColor(x, y, sf::Color(color.toInteger()));
 		// setPixelColor(x, y, sf::Color(color.r * m, color.g * m, color.b * m));
@@ -203,20 +224,17 @@ public:
 		for (int i = 0; i < 2; i++) {
 			auto p = imagePositions[i] / scale;
 			auto m = magnification[i];
-			// получилось так что первая точка не меняется а вторая выходит за пределы. типа
-			// 524 524 296 296
-			// -1888 524 -984 296
 			if (!checkPoint(p.x, p.y)) 							
 				return;
-			sf::Color deltaColor(color.r * (m - 1), color.g * (m - 1), color.b * (m - 1));
+			// sf::Color deltaColor(color.r * (m - 1), color.g * (m - 1), color.b * (m - 1));
 			// unsigned x_ = (unsigned)std::ceil(p.x);
 			// unsigned y_ = (unsigned)std::ceil(p.y);
 			// setPixelColor(x_, y_, color + deltaColor);
-			setPixelColor(p.x, p.y, color + deltaColor);
-			setPixelColor(p.x, p.y + 1, color + deltaColor);
-			setPixelColor(p.x, p.y - 1, color + deltaColor);
-			setPixelColor(p.x + 1, p.y, color + deltaColor);
-			setPixelColor(p.x - 1, p.y, color + deltaColor);
+			setPixelColor(p.x, p.y, color, m);
+			// setPixelColor(p.x, p.y + 1, color + deltaColor);
+			// setPixelColor(p.x, p.y - 1, color + deltaColor);
+			// setPixelColor(p.x + 1, p.y, color + deltaColor);
+			// setPixelColor(p.x - 1, p.y, color + deltaColor);
 
 			// x_ += 1;
 			// y_ += 1;
@@ -267,12 +285,13 @@ public:
 		// auto startTime = std::time(nullptr);
 		// auto currentTime = time(nullptr);
 		sf::Clock clock;
-		float startTime;
+		float currentTtime;
+		// window.setFramerateLimit(120);
 		while (window.isOpen())
     	{
 			// startTime = std::time(nullptr);
-			
-			startTime = clock.getElapsedTime().asSeconds();
+			currentTtime = clock.restart().asSeconds();
+			// startTime = clock.getElapsedTime().asSeconds();
 			sf::Event event;
 
 			while (window.pollEvent(event))
@@ -287,9 +306,11 @@ public:
 				}
 
                 else if (sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+                // else if (event.type == sf::Event::MouseMoved){
 					mouseHandle();
-                    reverseProcessImage();
+					reverseProcessImage();
                     // processImage();
+					
 				}
 			}
 
@@ -305,7 +326,7 @@ public:
 
 			// zoomText.setString("Zoom: " + std::to_string(fractal->getScale() / fractal->getStartScale()));
 			// sf::Time elapsed1 = clock.getElapsedTime
-			precText.setString("FPS: " + std::to_string(1 / (clock.getElapsedTime().asSeconds() - startTime)));
+			precText.setString("FPS: " + std::to_string(1 / currentTtime));
 			// precText.setPosition(sf::Vector2f(0, 32));
 			// window.draw(zoomText);
 			window.draw(precText);	

@@ -32,7 +32,7 @@ protected:
     double magnification(double angle) {
         // auto beta2 = std::pow(beta, 2);
         // return (beta2 + 2) / (2 * beta * std::sqrt(beta2 + 4)) + 0.5
-        return 1 / (1 - std::pow(angle / einstAngle, -4));
+        return std::abs(1 / (1 - std::pow(angle / einstAngle, -4)));
     }
 
 public:
@@ -49,17 +49,22 @@ public:
         auto beta = std::sqrt(beta2);
         double angle1 = (beta + std::sqrt(beta2 + 4 * std::pow(einstAngle, 2))) / 2;
         double angle2 = std::abs(beta - std::sqrt(beta2 + 4 * std::pow(einstAngle, 2))) / 2;
-
+        
         Point<T> imagePos1 = dp * angle1 / beta + lens.center;
         Point<T> imagePos2 = dp * (-angle2) / beta + lens.center;
         std::array<Point<T>, 2> imagePositions = {imagePos1, imagePos2};
 
         double magn_[2] {magnification(angle1), magnification(angle2)};
+
+        // std::cout << angle2 << ' ' << magn_[1] << std::endl;
+
         // if (magn_[0] > 1)
             // std::cout << magn_[0] << std::endl;
         *magn = *magn_;
+        for (int i = 0; i < 2; i++)
+            magn[i] = magn_[i];
         // if (magn_[0] > 1)
-            // std::cout << magn_[0] << std::endl;
+            // std::cout << magn[0] << std::endl;
         // magn[0] = magnification(angle1);
         // magn[1] = magnification(angle2);
         // static Point<T> imagePositions[2] (imagePos1, imagePos2);
@@ -74,7 +79,7 @@ public:
         // auto theta = std::sqrt(dp * dp);
         auto theta = dp.norm();
         auto beta = (dp * dp - einstAngle * einstAngle) / theta;
-        magn = std::abs(magnification(theta));
+        magn = magnification(theta);
         // std::cout << theta << ' ' << magn << std::endl;
         // double angle = (beta + std::sqrt(beta * beta + 4 * std::pow(einstAngle, 2))) / 2;
         // magn = magnification(angle);
