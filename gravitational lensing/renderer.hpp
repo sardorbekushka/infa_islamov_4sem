@@ -16,10 +16,14 @@ private:
     sf::RenderWindow window;
     // sf::Uint8 *pixels = nullptr;
     sf::Image source;
-	sf::Image image;
+	// sf::Image image;
     unsigned width, height;
     LensSolver<T> *solver = nullptr;
+	sf::Uint8 *pixels = nullptr;
 	double scale;
+	float *magn;
+	// bool showMagnification;
+	// sf::Color (*colorMap)(sf::Color, double);
 
     /** 
 	 * Maps some value to the RGBA colorscheme.
@@ -38,11 +42,25 @@ private:
 	 * @param y vertical coordinate of pixel.
 	 * @param t the value which will be mapped to the color (depends on iterations number).
 	*/
-    void setPixelColor(double x, double y, sf::Color color, double m) {
+
+	static sf::Color magnificateColor(sf::Color color, double m) {
+		if (m > 4) m = 4;
+
+		color.r = (color.r * m > 255) ? 255 : color.r * m;
+		color.g = (color.g * m > 255) ? 255 : color.g * m;
+		color.b = (color.b * m > 255) ? 255 : color.b * m;
+
+		return color;
+	}
+
+	static sf::Color notMafnificateColor(sf::Color color, double m) {
+		return color;
+	}
+
+    void setPixelColor(unsigned x, unsigned y, sf::Color& color, Point<double> p) {
         // if (x < 0 || x > width || y < 0 || y > height)
             // return;
 		// image.setPixel(x, y, color + image.getPixel(x, y));
-		if (m > 2) m = 2;
 
 		// auto r = (color.r * m > 255) ? 255 : color.r * m;
 		// auto g = (color.g * m > 255) ? 255 : color.g * m;
@@ -52,12 +70,41 @@ private:
 		// color.g = (color.g *= m > 255) ? 255 : 50;
 		// color.b = (color.b *= m > 255) ? 255 : 50;
 
-		// if (color.r *= m > 255) color.r = 255;
-		// if (color.g *= m > 255) color.g = 255;
-		// if (color.b *= m > 255) color.b = 255;
-		// image.setPixel(x, y, sf::Color(r, g, b));
-		// image.setPixel(x, y, sf::Color::Magenta);
-		image.setPixel(x, y, color);
+
+		// if (m > 4) m = 4;
+		// else if (m < 0.25) m = 0.25;
+		
+		 // короче попробуй сделать как в мандельброте типа хранить массив с пикселями и обновлять там данные, мб ускорит код
+
+		// color.r = (color.r * m > 255) ? 255 : color.r * m;
+		// color.g = (color.g * m > 255) ? 255 : color.g * m;
+		// color.b = (color.b * m > 255) ? 255 : color.b * m;
+
+		// pixels[4 * (width * y + x)] = (color.r * m > 255) ? 255 : color.r * m;
+		// pixels[4 * (width * y + x) + 1] = (color.g * m > 255) ? 255 : color.g * m;
+		// pixels[4 * (width * y + x) + 2] = (color.b * m > 255) ? 255 : color.b * m;
+		// pixels[4 * (width * y + x) + 3] = 255;
+		int r = color.r;
+		int g = color.g;
+		int b = color.b;
+		
+		// if (m > 1)
+		// r =  (r * m > 255) ? 255 : r * m;
+		// if (b > 300) 
+			// std::cout << "ffr" << std::endl;
+		auto m = magn[(unsigned)std::round(std::sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y)))];
+		r = (r * m > 255) ? 255 : r * m;
+		g = (g * m > 255) ? 255 : g * m;
+		b = (b * m > 255) ? 255 : b * m;
+		// g *= m;
+		// b *= m;
+		pixels[4 * (width * y + x)] = r;
+		pixels[4 * (width * y + x) + 1] = g;
+		pixels[4 * (width * y + x) + 2] = b;
+		
+		pixels[4 * (width * y + x) + 3] = 255;
+		
+		// image.setPixel(x, y, color);
 	}
 
 	template <typename U>
@@ -97,6 +144,13 @@ private:
 		else if (event.key.code == sf::Keyboard::BackSpace)
 			solver->updateMass(-k);
 
+		// if (event.key.code == sf::Keyboard::Enter) {
+		// 	showMagnification = !showMagnification;
+		// 	colorMap = notMafnificateColor;
+		// 	if (showMagnification) 
+		// 		colorMap = magnificateColor;
+		// }
+
 		// std::cout << event.key.code << std::endl;
 	// 		fractal->updateMaxIterations(-10);
 
@@ -109,6 +163,14 @@ private:
     //         fractal->reset();
 	}
 
+	void setMagnification() {
+		for (unsigned i = 0; i < std::sqrt(width * width + height * height) + 1; i++) {
+			magn[i] = solver->magnification(i * scale);
+			// magn[i] = 2;
+		}
+	
+	}
+
 public: 
     /**
 	 * Constructor of the class. 
@@ -116,7 +178,7 @@ public:
 	 * @param fractal pointer to object of Fractal (or its subclass) type
      * @param title title of the window (unnecessary)
 	*/
-    Renderer(LensSolver<T> *solver , std::string filename, std::string title): solver(solver)
+    Renderer(LensSolver<T> *solver , std::string filename, std::string title): solver(solver)//, showMagnification(true), colorMap(magnificateColor)
 	//  , height(HEIGHT), width(WIDTH), 
                                                     //  window(sf::VideoMode(WIDTH, HEIGHT), title) {
                                                     //  pixels(new sf::Uint8[WIDTH * HEIGHT * 4]), scale_param(1) {
@@ -126,18 +188,21 @@ public:
             // delete [] pixels;
             throw std::runtime_error("Failed to open file.");
         }
-		if (!image.loadFromFile(filename))
-        {
+		// if (!image.loadFromFile(filename))
+        // {
             // delete [] pixels;
-            throw std::runtime_error("Failed to open file.");
-        }
+            // throw std::runtime_error("Failed to open file.");
+        // }
 		height = source.getSize().y;
 		width = source.getSize().x;
 		// scale = solver->getEinstainAngle() / height * 8;
 		scale = 3e-2;
 		solver->setLensCenter(width / 2 * scale, height / 2 * scale);
+		pixels = new sf::Uint8[width * height * 4];
 		// std::cout << scale << std::endl;
 		window.create(sf::VideoMode(width, height), title);
+		magn = new float[std::sqrt(width * width + height * height) + 1];
+		setMagnification();
     }
 
 
@@ -148,7 +213,7 @@ public:
     */
     void processImage() {
 		// image.copy(sf::Image(image.getSize().x, image.getSize().y, sf::Color::Black));
-		image.create(image.getSize().x, image.getSize().y);
+		// image.create(image.getSize().x, image.getSize().y);
 
 		// image.loadFromFile("resources/galaxy.jpg");
 		for (unsigned y = 0; y < height; y++)
@@ -175,17 +240,19 @@ public:
     }
 
 	void reverseProcessImage() {
-		image.create(image.getSize().x, image.getSize().y);
+		// image.create(image.getSize().x, image.getSize().y);
+		auto p = solver->getLensCenter();
 		for (unsigned y = 0; y < height; y++)
 			for (unsigned x = 0; x < width; x++) 
-				reverseProcessPoint(x, y);
+				reverseProcessPoint(x, y, p);
+		
 	}
 
-	void reverseProcessPoint(unsigned x, unsigned y) {
+	void reverseProcessPoint(unsigned x, unsigned y, Point<double> center) {
 
-		double magnification = 1.0;
-		double &m = magnification;
-		auto p = solver->reverseProcessPoint(x * scale, y * scale, m) / scale;
+		float magnification = 1.0;
+		// m = magnification;
+		auto p = solver->reverseProcessPoint(x * scale, y * scale, magnification) / scale;
 		// if ((p - Point<double>(500, 200)) * (p - Point<double>(500, 200)) < 10)
 			// std::cout << p.x << ' ' << x << std::endl;
 		if (!checkPoint(p.x, p.y))
@@ -193,7 +260,7 @@ public:
 		auto color = getSourceColor(p.x, p.y);
 		
 		
-		setPixelColor(x, y, color, m);
+		setPixelColor(x, y, color, center);
 
 		// sf::Color deltaColor(color.r * (m - 1), color.g * (m - 1), color.b * (m - 1));
 			// unsigned x_ = (unsigned)std::ceil(p.x);
@@ -318,7 +385,10 @@ public:
 
             // processImage();
             // texture.loadFromImage(image);
-			texture.update(image);
+			texture.update(pixels);
+
+			// texture.update(image);
+
 			// texture.setSmooth(true);
 
             sprite.setTexture(texture);
@@ -338,6 +408,7 @@ public:
 
     ~Renderer() {
         window.close();
-        // delete [] pixels;
+        delete [] pixels;
+		delete [] magn;
     }
 };
