@@ -29,12 +29,6 @@ protected:
         return std::sqrt(4 * G * lens.mass * D_ls / D_s / D_l / 3 / 1e7) / c;
     }
 
-    double magnification(double angle) {
-        // auto beta2 = std::pow(beta, 2);
-        // return (beta2 + 2) / (2 * beta * std::sqrt(beta2 + 4)) + 0.5
-        return std::abs(1 / (1 - std::pow(angle / einstAngle, -4)));
-    }
-
 public:
     LensSolver(double mass, double z1, double z2, T x, T y): lens{mass, z1, Point<T>(x, y)}, source{z2} {
         // source.z = z2;
@@ -42,6 +36,12 @@ public:
     }
     LensSolver(LensSolver&) = default;
 	LensSolver(LensSolver&&) = default;
+
+    float magnification(double angle) {
+        // auto beta2 = std::pow(beta, 2);
+        // return (beta2 + 2) / (2 * beta * std::sqrt(beta2 + 4)) + 0.5
+        return std::abs(1 / (1 - std::pow(angle / einstAngle, -4)));
+    }
 
     std::array<Point<T>, 2> processPoint(Point<T> p, double *magn) {
         auto dp = p - lens.center;
@@ -74,7 +74,7 @@ public:
         return imagePositions;
     }
 
-    Point<T> reverseProcessPoint(Point<T> p, double &magn) {
+    Point<T> reverseProcessPoint(Point<T> p, float &magn) {
         auto dp = p - lens.center;
         // auto theta = std::sqrt(dp * dp);
         auto theta = dp.norm();
@@ -90,7 +90,7 @@ public:
         return processPoint(Point<T>(x, y), magn);
     }
 
-    Point<T> reverseProcessPoint(T x, T y, double &magn) {
+    Point<T> reverseProcessPoint(T x, T y, float &magn) {
         return reverseProcessPoint(Point<T>(x, y), magn);
     }
 
