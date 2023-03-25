@@ -10,7 +10,6 @@
 // #include "pointLensSolver.hpp"
 
 
-template <typename T>
 class Renderer final {
 private:
     sf::RenderWindow window;
@@ -18,7 +17,7 @@ private:
     sf::Image source;
 	// sf::Image image;
     unsigned width, height;
-    LensSolver<T> *solver = nullptr;
+    LensSolver *solver = nullptr;
 	sf::Uint8 *pixels = nullptr;
 	double scale;
 	float *magn;
@@ -57,7 +56,7 @@ private:
 		return color;
 	}
 
-    void setPixelColor(unsigned x, unsigned y, sf::Color& color, Point<double> p) {
+    void setPixelColor(unsigned x, unsigned y, sf::Color& color, Point p) {
         // if (x < 0 || x > width || y < 0 || y > height)
             // return;
 		// image.setPixel(x, y, color + image.getPixel(x, y));
@@ -98,6 +97,7 @@ private:
 		b = (b * m > 255) ? 255 : b * m;
 		// g *= m;
 		// b *= m;
+
 		pixels[4 * (width * y + x)] = r;
 		pixels[4 * (width * y + x) + 1] = g;
 		pixels[4 * (width * y + x) + 2] = b;
@@ -117,7 +117,7 @@ private:
     void mouseHandle() {
 		sf::Vector2i posPixel = sf::Mouse::getPosition(window);
 		sf::Vector2f pos = window.mapPixelToCoords(posPixel);
-		solver->setLensCenter((T)pos.x * scale, (T)pos.y * scale);
+		solver->setLensCenter(pos.x * scale, pos.y * scale);
 		// std::cout << pos.
 		// solver->setLensCenter(-(T)pos.x + (T)width / 2, -(T)pos.y + (T)height / 2);
 	}
@@ -178,7 +178,7 @@ public:
 	 * @param fractal pointer to object of Fractal (or its subclass) type
      * @param title title of the window (unnecessary)
 	*/
-    Renderer(LensSolver<T> *solver , std::string filename, std::string title): solver(solver)//, showMagnification(true), colorMap(magnificateColor)
+    Renderer(LensSolver *solver , std::string filename, std::string title): solver(solver)//, showMagnification(true), colorMap(magnificateColor)
 	//  , height(HEIGHT), width(WIDTH), 
                                                     //  window(sf::VideoMode(WIDTH, HEIGHT), title) {
                                                     //  pixels(new sf::Uint8[WIDTH * HEIGHT * 4]), scale_param(1) {
@@ -206,7 +206,7 @@ public:
     }
 
 
-    Renderer(LensSolver<T> *solver, std::string filename): Renderer(solver, filename, "Gravitational lens model") {}
+    Renderer(LensSolver *solver, std::string filename): Renderer(solver, filename, "Gravitational lens model") {}
 
     /**
      * Sets all pixels' colors.
@@ -248,12 +248,12 @@ public:
 		
 	}
 
-	void reverseProcessPoint(unsigned x, unsigned y, Point<double> center) {
+	void reverseProcessPoint(unsigned x, unsigned y, Point center) {
 
 		float magnification = 1.0;
 		// m = magnification;
 		auto p = solver->reverseProcessPoint(x * scale, y * scale, magnification) / scale;
-		// if ((p - Point<double>(500, 200)) * (p - Point<double>(500, 200)) < 10)
+		// if ((p - Point(500, 200)) * (p - Point(500, 200)) < 10)
 			// std::cout << p.x << ' ' << x << std::endl;
 		if (!checkPoint(p.x, p.y))
 			return;
@@ -282,7 +282,7 @@ public:
 		// std::cout << x << std::endl;
 		// std::array<double, 2> &magnification = {1, 1};
 		double magnification[2] {1, 1};
-        std::array<Point<T>, 2> imagePositions = solver->processPoint((T)x * scale, (T)y * scale, magnification);
+        std::array<Point, 2> imagePositions = solver->processPoint(x * scale, y * scale, magnification);
         // auto imagePos1 = imagePositions[0];
         // auto imagePos2 = imagePositions[1];
 		// for (auto p = imagePositions.begin(); p != imagePositions.end(), ++p) {
@@ -297,7 +297,7 @@ public:
 			// unsigned x_ = (unsigned)std::ceil(p.x);
 			// unsigned y_ = (unsigned)std::ceil(p.y);
 			// setPixelColor(x_, y_, color + deltaColor);
-			setPixelColor(p.x, p.y, color, m);
+			setPixelColor(p.x, p.y, color, p);
 			// setPixelColor(p.x, p.y + 1, color + deltaColor);
 			// setPixelColor(p.x, p.y - 1, color + deltaColor);
 			// setPixelColor(p.x + 1, p.y, color + deltaColor);

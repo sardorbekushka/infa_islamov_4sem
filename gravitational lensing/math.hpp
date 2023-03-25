@@ -27,51 +27,50 @@ double angularDiameterDistanceBetween(double z1, double z2) {
     return angularDiameterDistance(z2) - (1 + z1) / (1 + z2) * angularDiameterDistance(z1);
 }
 
-template <typename T>
 struct Point {
-    T x, y;
+    double x, y;
 
-    Point(T x, T y): x(x), y(y) {}
+    Point(double x, double y): x(x), y(y) {}
     Point(const Point& rhs) = default;
     Point& operator=(const Point& rhs) = default;
     Point() = delete;
 
-    Point<T> operator + (const Point<T> &dp) {
-        return Point<T>(x + dp.x, y + dp.y);
+    Point operator + (const Point &dp) {
+        return Point(x + dp.x, y + dp.y);
     }
 
-    Point<T> operator += (const Point<T> &dp) {
-        *this = *this + Point<T>(dp.x, dp.y);
+    Point operator += (const Point &dp) {
+        *this = *this + Point(dp.x, dp.y);
         return *this;
     }
 
-    Point<T> operator - (const Point<T> &dp) {
-        return Point<T>(x - dp.x, y - dp.y);
+    Point operator - (const Point &dp) {
+        return Point(x - dp.x, y - dp.y);
     }
 
-    Point<T> operator -= (const Point<T> &dp) {
-        *this = *this - Point<T>(dp.x, dp.y);
+    Point operator -= (const Point &dp) {
+        *this = *this - Point(dp.x, dp.y);
         return *this;
     }
 
-    T operator * (const Point<T> &dp) {
+    double operator * (const Point &dp) {
         return (x * dp.x + y * dp.y);
     }
 
-    Point<T> operator * (const T numerator) {
-        return Point<T>(x * numerator, y * numerator);
+    Point operator * (const double numerator) {
+        return Point(x * numerator, y * numerator);
     }
 
-    Point<double> operator / (const double &denominator) {
-        return Point<T>(x / denominator, y / denominator);
+    Point operator / (const double &denominator) {
+        return Point(x / denominator, y / denominator);
     }
     
-    Point<double> operator /= (const double &denominator) {
+    Point operator /= (const double &denominator) {
         *this = *this / denominator;
         return *this;
     }
 
-    T norm() {
+    double norm() {
         return std::sqrt(x * x + y * y);
     }
 };

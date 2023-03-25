@@ -4,21 +4,19 @@
 #include <gsl/gsl_integration.h>
 #include "math.hpp"
 
-template <typename T>
 struct Lens {
     double mass;
     double z;
-    Point<T> center;
+    Point center;
 };
 
 struct Source {
     double z;
 };
 
-template <typename T>
 class LensSolver {
 protected:
-    Lens<T> lens;
+    Lens lens;
     Source source;
     double einstAngle;
 
@@ -30,7 +28,7 @@ protected:
     }
 
 public:
-    LensSolver(double mass, double z1, double z2, T x, T y): lens{mass, z1, Point<T>(x, y)}, source{z2} {
+    LensSolver(double mass, double z1, double z2, double x, double y): lens{mass, z1, Point(x, y)}, source{z2} {
         // source.z = z2;
         einstAngle = einsteinAngle();
     }
@@ -43,16 +41,16 @@ public:
         return std::abs(1 / (1 - std::pow(angle / einstAngle, -4)));
     }
 
-    std::array<Point<T>, 2> processPoint(Point<T> p, double *magn) {
+    std::array<Point, 2> processPoint(Point p, double *magn) {
         auto dp = p - lens.center;
         auto beta2 = dp * dp;
         auto beta = std::sqrt(beta2);
         double angle1 = (beta + std::sqrt(beta2 + 4 * std::pow(einstAngle, 2))) / 2;
         double angle2 = std::abs(beta - std::sqrt(beta2 + 4 * std::pow(einstAngle, 2))) / 2;
         
-        Point<T> imagePos1 = dp * angle1 / beta + lens.center;
-        Point<T> imagePos2 = dp * (-angle2) / beta + lens.center;
-        std::array<Point<T>, 2> imagePositions = {imagePos1, imagePos2};
+        Point imagePos1 = dp * angle1 / beta + lens.center;
+        Point imagePos2 = dp * (-angle2) / beta + lens.center;
+        std::array<Point, 2> imagePositions = {imagePos1, imagePos2};
 
         double magn_[2] {magnification(angle1), magnification(angle2)};
 
@@ -67,14 +65,14 @@ public:
             // std::cout << magn[0] << std::endl;
         // magn[0] = magnification(angle1);
         // magn[1] = magnification(angle2);
-        // static Point<T> imagePositions[2] (imagePos1, imagePos2);
+        // static Point imagePositions[2] (imagePos1, imagePos2);
         // imagePositions[0] = imagePos1;
         // imagePositions[1] = imagePos2;
         // std::cout << "a" << std::endl;
         return imagePositions;
     }
 
-    Point<T> reverseProcessPoint(Point<T> p, float &magn) {
+    Point reverseProcessPoint(Point p, float &magn) {
         auto dp = p - lens.center;
         // auto theta = std::sqrt(dp * dp);
         auto theta = dp.norm();
@@ -86,24 +84,24 @@ public:
         return dp / theta * beta + lens.center;
     }
 
-    std::array<Point<T>, 2> processPoint(T x, T y, double *magn) {
-        return processPoint(Point<T>(x, y), magn);
+    std::array<Point, 2> processPoint(double x, double y, double *magn) {
+        return processPoint(Point(x, y), magn);
     }
 
-    Point<T> reverseProcessPoint(T x, T y, float &magn) {
-        return reverseProcessPoint(Point<T>(x, y), magn);
+    Point reverseProcessPoint(double x, double y, float &magn) {
+        return reverseProcessPoint(Point(x, y), magn);
     }
 
-    void moveLens(T dx, T dy) {
-        lens.center += Point<T>(dx, dy);
+    void moveLens(double dx, double dy) {
+        lens.center += Point(dx, dy);
     }
 
-    void setLensCenter(T x, T y) {
-        lens.center = Point<T>(x, y);
+    void setLensCenter(double x, double y) {
+        lens.center = Point(x, y);
         // std::cout << "lens: " << lens.center.x << ' ' << lens.center.y << std::endl;
     }
 
-    Point<T> getLensCenter() {
+    Point getLensCenter() {
         return lens.center;
     }
 
