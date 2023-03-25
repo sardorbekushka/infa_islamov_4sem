@@ -31,6 +31,8 @@ private:
 	 * 
 	*/
     sf::Color getSourceColor(int x, int y) {
+		if (!checkPoint(x, y))
+			return sf::Color::Black;
         return source.getPixel(x, y);
 	}
 
@@ -57,6 +59,8 @@ private:
 	}
 
     void setPixelColor(unsigned x, unsigned y, sf::Color& color, Point p) {
+		for (int i = 0; i < 3; i++)
+			pixels[4 * (width * y + x) + i] = 0;
         // if (x < 0 || x > width || y < 0 || y > height)
             // return;
 		// image.setPixel(x, y, color + image.getPixel(x, y));
@@ -255,8 +259,6 @@ public:
 		auto p = solver->reverseProcessPoint(x * scale, y * scale, magnification) / scale;
 		// if ((p - Point(500, 200)) * (p - Point(500, 200)) < 10)
 			// std::cout << p.x << ' ' << x << std::endl;
-		if (!checkPoint(p.x, p.y))
-			return;
 		auto color = getSourceColor(p.x, p.y);
 		
 		
@@ -344,7 +346,7 @@ public:
         sf::Texture texture;
         texture.create(width, height);
 		texture.setSmooth(true);
-		// texture.setRepeated(true);
+		texture.setRepeated(false);
         sf::Sprite sprite;
 		// sprite.setScale
 		// processImage();
