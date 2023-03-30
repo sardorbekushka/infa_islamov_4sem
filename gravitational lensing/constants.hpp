@@ -8,4 +8,6 @@
 #define pi          M_PI
 #define WIDTH       1000
 #define HEIGHT      800
-#define fontName    "resources/arial.ttf"
+#define FPS         60
+#define fontSize    20
+#define fontName    "resources/fonts/dejavu-sans-mono.ttf"
