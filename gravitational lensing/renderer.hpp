@@ -133,8 +133,17 @@ public:
 		window.create(sf::VideoMode(width, height), title);
     }
 
+	/**
+	 * @param solver pointer to the LensSolver object
+	 * @param filename the name of the file with image for background (source)
+	 * @param realWidth real width of the object on image in arcminutes
+	*/
     Renderer(LensSolver *solver, std::string filename, float realWidth): Renderer(solver, filename, realWidth, "Gravitational lens model") {}
-    Renderer(LensSolver *solver, std::string filename): Renderer(solver, filename, 3, "Gravitational lens model") {}
+    /**
+	 * @param solver pointer to the LensSolver object
+	 * @param filename the name of the file with image for background (source)
+	*/
+	Renderer(LensSolver *solver, std::string filename): Renderer(solver, filename, 3, "Gravitational lens model") {}
 
     void processImage() {
 		for (unsigned y = 0; y < height; y++)
@@ -177,7 +186,7 @@ public:
 
 
     /**
-	 * The main method that polls the image and responds to any events.
+	 * The main method that updates the image and responds to any events.
 	 * 
 	 * @return information about successfully ending the polling (if program was aborted it doesn't return anything).
 	*/

@@ -30,7 +30,14 @@ protected:
     }
 
 public:
-    LensSolver(double mass, double z1, double z2, double x, double y): lens{mass, z1, Point(x, y)}, source{z2} {
+    /**
+     * @param mass mass of the lensing object (gravitational lens)
+     * @param z1 redshift of the lens
+     * @param z2 redshift of the source
+     * @param x initial horizontal coordinate of the lens
+     * @param y initial vertical coordinate of the lens
+    */
+    LensSolver(double mass, double z1, double z2, double x=0, double y=0): lens{mass, z1, Point(x, y)}, source{z2} {
         einstAngle = einsteinAngle();
     }
     LensSolver(LensSolver&) = default;
@@ -59,16 +66,16 @@ public:
         return imagePositions;
     }
 
+    std::array<Point, 2> processPoint(double x, double y, double *magn) {
+        return processPoint(Point(x, y), magn);
+    }
+
     Point reverseProcessPoint(Point p, float &magn) {
         auto dp = p - lens.center;
         auto theta = dp.norm();
         auto beta = (dp * dp - einstAngle * einstAngle) / theta;
         magn = magnification(theta);
         return dp / theta * beta + lens.center;
-    }
-
-    std::array<Point, 2> processPoint(double x, double y, double *magn) {
-        return processPoint(Point(x, y), magn);
     }
 
     Point reverseProcessPoint(double x, double y, float &magn) {
