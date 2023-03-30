@@ -110,6 +110,12 @@ private:
 	}
 
 public: 
+	/**
+	 * @param solver pointer to the LensSolver object
+	 * @param filename the name of the file with image for background (source)
+	 * @param realWidth real width of the object on image in arcminutes
+	 * @param title the title of window
+	*/
     Renderer(LensSolver *solver , std::string filename, float realWidth, std::string title): solver(solver), showMagnification(true)
         {
 			if (!source.loadFromFile(filename))
@@ -117,7 +123,7 @@ public:
 
 		height = source.getSize().y;
 		width = source.getSize().x;
-		scale = realWidth / width;
+		scale = realWidth * 29e-5 / width;
 
 		if (solver->getEinstainAngle() / scale > std::min(height, width)) 
 			std::cerr << "Warning! The lens too big for the image." << std::endl;
@@ -127,7 +133,8 @@ public:
 		window.create(sf::VideoMode(width, height), title);
     }
 
-    Renderer(LensSolver *solver, std::string filename): Renderer(solver, filename, 9e-4, "Gravitational lens model") {}
+    Renderer(LensSolver *solver, std::string filename, float realWidth): Renderer(solver, filename, realWidth, "Gravitational lens model") {}
+    Renderer(LensSolver *solver, std::string filename): Renderer(solver, filename, 3, "Gravitational lens model") {}
 
     void processImage() {
 		for (unsigned y = 0; y < height; y++)
@@ -204,6 +211,8 @@ public:
 		
 		sourceZ << solver->getSourceRedshift();
 		lensZ << solver->getLensRedshift();
+		mass << solver->getMass();
+
 		scale_ << scale;
 		omegaM_ << omegaM;
 		omegaL_ << omegaL;

@@ -27,6 +27,7 @@ double angularDiameterDistanceBetween(double z1, double z2) {
     return angularDiameterDistance(z2) - (1 + z1) / (1 + z2) * angularDiameterDistance(z1);
 }
 
+#pragma once
 struct Point {
     double x, y;
 
