@@ -17,7 +17,6 @@ private:
 	double scale;						// scale param (ratio of real size to the number of pixels in window)
 	bool showMagnification;				// flag shows if magnification will be shown
 
-
 	/**
 	 * checks if the point belongs to the window
 	 * 
@@ -42,27 +41,6 @@ private:
 		if (!checkPoint(x, y))
 			return sf::Color::Black;
         return source.getPixel(x, y);
-	}
-
-	/**
-	 * sets the magnificated color of the pixel in array
-	 * 
-	 * @overload
-	*/
-    void setPixelColor(unsigned x, unsigned y, sf::Color& color, Point p) {
-		for (int i = 0; i < 3; i++)
-			pixels[4 * (width * y + x) + i] = 0;
-        		
-		float m = 1;
-		// m = magn[(unsigned)std::round((Point(x, y) - p / scale).norm())];
-		float r = color.r * m;
-		float g = color.g * m;
-		float b = color.b * m;
-
-		int newColor[4] = {r > 255 ? 255 : (int)r, g > 255 ? 255 : (int)g, b > 255 ? 255 : (int)b, 255};
-
-		for (int i = 0; i < 4; i++)
-			pixels[4 * (width * y + x) + i] = newColor[i];
 	}
 
 	/**
@@ -127,19 +105,6 @@ private:
 
 		if (event.key.code == sf::Keyboard::Enter) 
 			showMagnification = !showMagnification;
-	}
-
-	/**
-	 * initialize the magnifaction array
-	 * 
-	 * @param magn the array will be initialized
-	*/
-	void setMagnification(float *magn) {
-		for (unsigned i = 0; i < std::sqrt(width * width + height * height) + 1; i++) {
-			magn[i] = solver->magnification(i * scale);
-			if (magn[i] > 2) magn[i] = 2;
-			else if (magn[i] < 0.25) magn[i] = 0.25; 
-		}
 	}
 
 public: 
