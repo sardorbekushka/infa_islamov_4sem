@@ -9,31 +9,51 @@
 
 class Renderer final {
 private:
-    sf::RenderWindow window;
-    sf::Image source;
-    unsigned width, height;
-    LensSolver *solver = nullptr;
-	sf::Uint8 *pixels = nullptr;
-	double scale;
-	bool showMagnification;
+    sf::RenderWindow window;			// the window where render is going
+    sf::Image source;					// source image that will be refracted
+    unsigned width, height;				// width and height of the window
+    LensSolver *solver = nullptr;		// pointer the LensSolver object will be used in calculations
+	sf::Uint8 *pixels = nullptr;		// array with information about pixels color
+	double scale;						// scale param (ratio of real size to the number of pixels in window)
+	bool showMagnification;				// flag shows if magnification will be shown
 
 
+	/**
+	 * checks if the point belongs to the window
+	 * 
+	 * @param x the horizontal coordinate of the pixel
+	 * @param y the vertical coordinate of the pixel
+	 * 
+	 * @return is the pixel in window
+	*/
 	template <typename U>
 	bool checkPoint(U x, U y) {
 		return (x > 0 && x < width && y > 0 && y < height);
 	}
 
+	/** gets the color in source image at the specified point
+	 * 
+	 * @param x the horizontal coordinate of the pixel
+	 * @param y the vertical coordinate of the pixel
+	 * 
+	 * @return received color
+	*/
     sf::Color getSourceColor(int x, int y) {
 		if (!checkPoint(x, y))
 			return sf::Color::Black;
         return source.getPixel(x, y);
 	}
 
+	/**
+	 * sets the magnificated color of the pixel in array
+	 * 
+	 * @overload
+	*/
     void setPixelColor(unsigned x, unsigned y, sf::Color& color, Point p) {
 		for (int i = 0; i < 3; i++)
 			pixels[4 * (width * y + x) + i] = 0;
         		
-		float m;
+		float m = 1;
 		// m = magn[(unsigned)std::round((Point(x, y) - p / scale).norm())];
 		float r = color.r * m;
 		float g = color.g * m;
@@ -45,21 +65,29 @@ private:
 			pixels[4 * (width * y + x) + i] = newColor[i];
 	}
 
+	/**
+	 * sets the magnificated color of the pixel in array
+	 * 
+	 * @param x the horizontal coordinate of the pixel
+	 * @param y the vertical coordinate of the pixel
+	 * @param color the color which will be set
+	 * @param m the magnification at this point
+	*/
 	void setPixelColor(unsigned x, unsigned y, sf::Color& color, float m) {
-		for (int i = 0; i < 3; i++)
-			pixels[4 * (width * y + x) + i] = 0;
+		int newColor[4] = {color.r, color.g, color.b, 255};
 
-		// float newColor[4] = {(float)color.r, (float)color.g, (float)color.b, 255};
-		float r = color.r * m;
-		float g = color.g * m;
-		float b = color.b * m;
+		// if (showMagnification)
+		for (int i = 0; i < 3 * showMagnification; i++) {
+			int colorComponent = newColor[i] * m;
+			newColor[i] = colorComponent > 255 ? 255 : colorComponent;
+		}
 
-		// for (int i = 0; i < showMagnification * 3; i++) {
-		// 	float colorComponent = newColor[i] * m;
-		// 	newColor[i] = colorComponent > 255 ? 255 : colorComponent;
-		// }
+		// int r = color.r * m;
+		// int g = color.g * m;
+		// int b = color.b * m;
 
-		float newColor[4] = {r > 255 ? 255 : r, g > 255 ? 255 : g, b > 255 ? 255 : b, 255};
+		// int newColor[4] = {r > 255 ? 255 : r, g > 255 ? 255 : g, b > 255 ? 255 : b, 255};
+		// int newColor[4] = {r, g, b, 255};
 		
 		for (int i = 0; i < 4; i++)
 			pixels[4 * (width * y + x) + i] = newColor[i];
@@ -75,7 +103,7 @@ private:
 	}
 
 	/**
-	 * Handles keyboard events.
+	 * Handles keyboard events. Can move the lens, change lens mass and switch the magnication mode
 	*/
     void keyboardHandle(sf::Event event) {
 		auto delta = 5 * scale;
@@ -101,6 +129,11 @@ private:
 			showMagnification = !showMagnification;
 	}
 
+	/**
+	 * initialize the magnifaction array
+	 * 
+	 * @param magn the array will be initialized
+	*/
 	void setMagnification(float *magn) {
 		for (unsigned i = 0; i < std::sqrt(width * width + height * height) + 1; i++) {
 			magn[i] = solver->magnification(i * scale);
@@ -112,14 +145,16 @@ private:
 public: 
 	/**
 	 * @param solver pointer to the LensSolver object
-	 * @param filename the name of the file with image for background (source)
+	 * @param filename the path to the file with image for background (source)
 	 * @param realWidth real width of the object on image in arcminutes
-	 * @param title the title of window
+	 * @param title the title of the window
+	 * 
+	 * @throw std::runtime_error is thrown if the 'filename' couldn't be open
 	*/
     Renderer(LensSolver *solver , std::string filename, float realWidth, std::string title): solver(solver), showMagnification(true)
-        {
-			if (!source.loadFromFile(filename))
-        		throw std::runtime_error("Failed to open file.");
+    {
+		if (!source.loadFromFile(filename))
+    		throw std::runtime_error("Failed to open file.");
 
 		height = source.getSize().y;
 		width = source.getSize().x;
@@ -145,12 +180,18 @@ public:
 	*/
 	Renderer(LensSolver *solver, std::string filename): Renderer(solver, filename, 3, "Gravitational lens model") {}
 
+	/**
+	 * processes an image in straight way. each point in source splits to the calculated positions
+	*/
     void processImage() {
 		for (unsigned y = 0; y < height; y++)
             for (unsigned x = 0; x < width; x++)
                 processPoint(x, y);
     }
 
+	/**
+	 * processes an image in reverse way. for each point is calculated where is the original point in the source
+	*/
 	void reverseProcessImage() {
 		auto p = solver->getLensCenter();
 		for (unsigned y = 0; y < height; y++)
@@ -158,6 +199,9 @@ public:
 				reverseProcessPoint(x, y);
 	}
 
+	/**
+	 * processes a pixel in straight way. the point splits to the calculated positions
+	*/
 	void processPoint(unsigned x, unsigned y) {
 		double magnification[2] {1, 1};
         std::array<Point, 2> imagePositions = solver->processPoint(x * scale, y * scale, magnification);
@@ -173,6 +217,9 @@ public:
 		}
     }
 
+	/**
+	 * processes an image in reverse way. for the point is calculated where is the original position in the source
+	*/
 	void reverseProcessPoint(unsigned x, unsigned y) {
 		float magnification = 1.0;
 		float &m = magnification;
@@ -184,11 +231,10 @@ public:
 		setPixelColor(x, y, color, m);
 	}
 
-
     /**
-	 * The main method that updates the image and responds to any events.
+	 * the main method that updates an image and responds to any events
 	 * 
-	 * @return information about successfully ending the polling (if program was aborted it doesn't return anything).
+	 * @return information about successfully ending the polling (if program was aborted it doesn't return anything)
 	*/
     int poll(){
 		sf::Font font;
