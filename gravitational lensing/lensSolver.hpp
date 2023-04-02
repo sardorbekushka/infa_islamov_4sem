@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <array>
-#include <SFML/Graphics.hpp>
-#include <gsl/gsl_integration.h>
 #include "math.hpp"
 
 struct Lens {
