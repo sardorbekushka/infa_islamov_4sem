@@ -10,10 +10,10 @@ Each point is considered as a separate source refracted by massive object. For r
 
 There are some examples of result model
 
-![Lensing of Bubble Nebula](https://github.com/meIonmusk/infa_islamov_4sem/tree/main/gravitational%20lensing/output_images/BubbleNebula.jpeg "Lensing of Bubble Nebula")
-![Lensing of California Nebula](https://github.com/meIonmusk/infa_islamov_4sem/tree/main/gravitational%20lensing/output_images/CaliforniaNebula.jpeg "Lensing of Bubble Nebula")
-![Lensing of Orion Nebula](https://github.com/meIonmusk/infa_islamov_4sem/tree/main/gravitational%20lensing/output_images/OrionNebula.jpeg "Lensing of Orion Nebula")
-![Lensing of Running Man Nebula](https://github.com/meIonmusk/infa_islamov_4sem/tree/main/gravitational%20lensing/output_images/RunningManNebula.jpeg "Lensing of Running man Nebula")
+![Lensing of Bubble Nebula](./output_images/BubbleNebula.jpeg "Lensing of Bubble Nebula")
+![Lensing of California Nebula](./output_images/CaliforniaNebula.jpeg "Lensing of Bubble Nebula")
+![Lensing of Orion Nebula](./output_images/OrionNebula.jpeg "Lensing of Orion Nebula")
+![Lensing of Running Man Nebula](./output_images/RunningManNebula.jpeg "Lensing of Running man Nebula")
 
 And some tips about using. To compile and run code execute `complile.sh` file in this directory or use following expression 
     
