@@ -1,7 +1,7 @@
 # Strong gravitational lensing model
 
-It is a model of strong gravitational lensing in the point source and point lens approximation. 
-Each point is considered as a separate source refracted by massive object. For renderin is using SFML graphic library.
+It is a model of strong gravitational lensing in the point source and point lens approximations. 
+Each point is considered as a separate source refracted by massive object. For rendering is used SFML graphic library.
 
 ### Required
 - C++ compiler (C++17 standart was used)
