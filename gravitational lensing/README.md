@@ -10,10 +10,13 @@ Each point is considered as a separate source refracted by massive object. For r
 
 There are some examples of result model
 
-![Lensing of Bubble Nebula](./output_images/BubbleNebula.jpeg "Lensing of Bubble Nebula")
-![Lensing of California Nebula](./output_images/CaliforniaNebula.jpeg "Lensing of Bubble Nebula")
-![Lensing of Orion Nebula](./output_images/OrionNebula.jpeg "Lensing of Orion Nebula")
-![Lensing of Running Man Nebula](./output_images/RunningManNebula.jpeg "Lensing of Running man Nebula")
+<img src="./output_images/BubbleNebula.jpeg" alt="Lensing of Bubble Nebula" width="50%" height="" title="Lensing of Bubble Nebula">
+
+<img src="./output_images/CaliforniaNebula.jpeg" alt="Lensing of California Nebula" width="50%" height="" title="Lensing of California Nebula">
+
+<img src="./output_images/OrionNebula.jpeg" alt="Lensing of Orion Nebula" width="50%" height="" title="Lensing of Orion Nebula">
+
+<img src="./output_images/RunningManNebula.jpeg" alt="Lensing of Running Man Nebula" width="50%" height="" title="Lensing of Running Man Nebula">
 
 And some tips about using. To compile and run code execute `complile.sh` file in this directory or use following expression 
     
@@ -21,7 +24,7 @@ And some tips about using. To compile and run code execute `complile.sh` file in
 
     ./main
 
-### Controls
+### Control
 
 | Command |              Action            |
 |---------|--------------------------------|
