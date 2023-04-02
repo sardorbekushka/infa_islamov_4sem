@@ -1,4 +1,4 @@
-### Strong gravitational lensing model
+# Strong gravitational lensing model
 
 It is a model of strong gravitational lensing in the point source and point lens approximation. 
 Each point is considered as a separate source refracted by massive object. For renderin is using SFML graphic library.
@@ -10,12 +10,12 @@ Each point is considered as a separate source refracted by massive object. For r
 
 There are some examples of result model
 
-![Lensing of Bubble Nebula](/output_images/BubbleNebula.jpeg "Lensing of Bubble Nebula")
-![Lensing of California Nebula](/output_images/CaliforniaNebula.jpeg "Lensing of Bubble Nebula")
-![Lensing of Orion Nebula](/output_images/OrionNebula.jpeg "Lensing of Orion Nebula")
-![Lensing of Running Man Nebula](/output_images/RunningManNebula.jpeg "Lensing of Running man Nebula")
+![Lensing of Bubble Nebula](https://github.com/meIonmusk/infa_islamov_4sem/tree/main/gravitational%20lensing/output_images/BubbleNebula.jpeg "Lensing of Bubble Nebula")
+![Lensing of California Nebula](https://github.com/meIonmusk/infa_islamov_4sem/tree/main/gravitational%20lensing/output_images/CaliforniaNebula.jpeg "Lensing of Bubble Nebula")
+![Lensing of Orion Nebula](https://github.com/meIonmusk/infa_islamov_4sem/tree/main/gravitational%20lensing/output_images/OrionNebula.jpeg "Lensing of Orion Nebula")
+![Lensing of Running Man Nebula](https://github.com/meIonmusk/infa_islamov_4sem/tree/main/gravitational%20lensing/output_images/RunningManNebula.jpeg "Lensing of Running man Nebula")
 
-And some tips about using. To compile and run code open complile.sh file in this directory or use following expression 
+And some tips about using. To compile and run code execute `complile.sh` file in this directory or use following expression 
     
     g++ -std=c++17 main.cpp -I/opt/local/include/ /opt/local/lib/libsfml-graphics.dylib /opt/local/lib/libsfml-audio.dylib  /opt/local/lib/libsfml-window.dylib /opt/local/lib/libsfml-system.dylib -Ofast -lgsl -lcblas -o main
 
