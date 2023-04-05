@@ -52,23 +52,13 @@ private:
 	 * @param m the magnification at this point
 	*/
 	void setPixelColor(unsigned x, unsigned y, sf::Color& color, float m) {
-		int newColor[4] = {color.r, color.g, color.b, 255};
+		int newColor[3] = {color.r, color.g, color.b};
 
-		// if (showMagnification)
-		for (int i = 0; i < 3 * showMagnification; i++) {
+		for (int i = 0; i < 3; i++) {
 			int colorComponent = newColor[i] * m;
 			newColor[i] = colorComponent > 255 ? 255 : colorComponent;
-		}
-
-		// int r = color.r * m;
-		// int g = color.g * m;
-		// int b = color.b * m;
-
-		// int newColor[4] = {r > 255 ? 255 : r, g > 255 ? 255 : g, b > 255 ? 255 : b, 255};
-		// int newColor[4] = {r, g, b, 255};
-		
-		for (int i = 0; i < 4; i++)
 			pixels[4 * (width * y + x) + i] = newColor[i];
+		}
 	}
 
 	/**
@@ -149,19 +139,28 @@ public:
 	 * processes an image in straight way. each point in source splits to the calculated positions
 	*/
     void processImage() {
-		for (unsigned y = 0; y < height; y++)
-            for (unsigned x = 0; x < width; x++)
-                processPoint(x, y);
+		if (showMagnification)
+			for (unsigned y = 0; y < height; y++)
+				for (unsigned x = 0; x < width; x++) 
+					processPoint(x, y);
+		else
+			for (unsigned y = 0; y < height; y++)
+				for (unsigned x = 0; x < width; x++) 
+					processPointWithoutMagn(x, y);
     }
 
 	/**
 	 * processes an image in reverse way. for each point is calculated where is the original point in the source
 	*/
 	void reverseProcessImage() {
-		auto p = solver->getLensCenter();
-		for (unsigned y = 0; y < height; y++)
-			for (unsigned x = 0; x < width; x++) 
-				reverseProcessPoint(x, y);
+		if (showMagnification)
+			for (unsigned y = 0; y < height; y++)
+				for (unsigned x = 0; x < width; x++) 
+					reverseProcessPoint(x, y);
+		else
+			for (unsigned y = 0; y < height; y++)
+				for (unsigned x = 0; x < width; x++) 
+					reverseProcessPointWithoutMagn(x, y);
 	}
 
 	/**
@@ -181,6 +180,23 @@ public:
 			setPixelColor(p.x, p.y, color, m);
 		}
     }
+	
+	/**
+	 * processes a pixel in straight way without magnification
+	*/
+	void processPointWithoutMagn(unsigned x, unsigned y) {
+		double magnification[2] {1, 1};
+        std::array<Point, 2> imagePositions = solver->processPoint(x * scale, y * scale, magnification);
+
+		auto color = getSourceColor(x, y);
+		for (int i = 0; i < 2; i++) {
+			auto p = imagePositions[i] / scale;
+			if (!checkPoint(p.x, p.y)) 							
+				return;
+
+			setPixelColor(p.x, p.y, color, 1);
+		}
+    }
 
 	/**
 	 * processes an image in reverse way. for the point is calculated where is the original position in the source
@@ -194,6 +210,17 @@ public:
 		m = (m > 2) ? 2 : (m < 0.25) ? 0.25 : m;
 
 		setPixelColor(x, y, color, m);
+	}
+
+	/**
+	 * processes an image in reverse way without magnification
+	*/
+	void reverseProcessPointWithoutMagn(unsigned x, unsigned y) {
+		float m = 1.0;
+		auto p = solver->reverseProcessPoint(x * scale, y * scale, m) / scale;
+		auto color = getSourceColor(p.x, p.y);
+		
+		setPixelColor(x, y, color, 1);
 	}
 
     /**
@@ -274,7 +301,7 @@ public:
 
 			precText.setString(modelInfo +  '\n' + \
 							   "lens mass: " + mass.str() + " kg" + '\n' + \
-							   "FPS: " + std::to_string(1 / currentTtime) + '\n'
+							   "FPS: " + std::to_string(1 / currentTtime) + '\n' \
 							    );
 			precText.setPosition(sf::Vector2f(10, 0));
 			window.draw(precText);	

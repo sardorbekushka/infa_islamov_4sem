@@ -20,7 +20,7 @@ double angularDiameterDistance(double z) {
     
     gsl_integration_qags(&F, 0.0, z, 0.0, 1e-7, 1000, w, &result, &error);
 
-    return c / (1 + z) * result;
+    return c0 / (1 + z) * result;
 }
 
 double angularDiameterDistanceBetween(double z1, double z2) {

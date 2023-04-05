@@ -27,7 +27,7 @@ protected:
         double D_ls = angularDiameterDistanceBetween(lens.z, source.z);
         double D_s = angularDiameterDistance(source.z);
         double D_l = angularDiameterDistance(lens.z);
-        return std::sqrt(4 * G * lens.mass * D_ls / D_s / D_l / 3 / 1e7) / c;
+        return std::sqrt(4 * G0 * lens.mass * D_ls / D_s / D_l / 3 / 1e7) / c0;
     }
 
 public:
