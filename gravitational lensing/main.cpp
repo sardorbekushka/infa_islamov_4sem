@@ -6,8 +6,8 @@
 
 int main() {
 	std::string sourceFile = "resources/images/BubbleNebulaMini.jpeg";
-    auto solver = new LensSolver(5e33, 0.5, 1.0);
-	Renderer renderer(solver, sourceFile, 15);
+    auto solver = new LensSolver(5e33, 0.5, 1);
+	Renderer renderer(solver, sourceFile, 900);
 	int code = renderer.poll();
 	delete solver;
 	return code;

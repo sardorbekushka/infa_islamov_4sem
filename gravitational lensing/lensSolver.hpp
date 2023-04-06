@@ -119,8 +119,8 @@ public:
     /**
      * moves the lens
      * 
-     * @param dx the horizontal move in radians
-     * @param dy the vertical move in radians
+     * @param dx the horizontal shift in radians
+     * @param dy the vertical shift in radians
     */
     void moveLens(float dx, float dy) {
         lens.center += Point(dx, dy);

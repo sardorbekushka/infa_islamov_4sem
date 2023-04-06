@@ -74,7 +74,7 @@ private:
 	 * Handles keyboard events. Can move the lens, change lens mass and switch the magnication mode
 	*/
     void keyboardHandle(sf::Event event) {
-		float delta = 5 * scale;
+		float delta = SHIFT * scale;
 
 		if (event.key.code == sf::Keyboard::Right)
 			solver->moveLens(delta, 0);
@@ -101,7 +101,7 @@ public:
 	/**
 	 * @param solver pointer to the LensSolver object
 	 * @param filename the path to the file with image for background (source)
-	 * @param realWidth real width of the object on image in arcminutes
+	 * @param realWidth real width of the object on image in arseconds
 	 * @param title the title of the window
 	 * 
 	 * @throw std::runtime_error is thrown if the 'filename' couldn't be open
@@ -113,7 +113,7 @@ public:
 
 		height = source.getSize().y;
 		width = source.getSize().x;
-		scale = realWidth * 29e-5 / width;
+		scale = realWidth * 485e-8 / width;
 
 		if (solver->getEinstainAngle() / scale > std::min(height, width)) 
 			std::cerr << "Warning! The lens too big for the image." << std::endl;
@@ -133,7 +133,7 @@ public:
 	 * @param solver pointer to the LensSolver object
 	 * @param filename the name of the file with image for background (source)
 	*/
-	Renderer(LensSolver *solver, std::string filename): Renderer(solver, filename, 3, "Gravitational lens model") {}
+	Renderer(LensSolver *solver, std::string filename): Renderer(solver, filename, 180, "Gravitational lens model") {}
 
 	/**
 	 * processes an image in straight way. each point in source splits to the calculated positions
