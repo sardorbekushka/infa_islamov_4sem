@@ -74,7 +74,7 @@ private:
 	 * Handles keyboard events. Can move the lens, change lens mass and switch the magnication mode
 	*/
     void keyboardHandle(sf::Event event) {
-		auto delta = 5 * scale;
+		float delta = 5 * scale;
 
 		if (event.key.code == sf::Keyboard::Right)
 			solver->moveLens(delta, 0);
@@ -86,7 +86,7 @@ private:
 		else if (event.key.code == sf::Keyboard::Down)
 			solver->moveLens(0, delta);
 
-		double k = 0.1;
+		float k = 0.1;
 		if (event.key.code == sf::Keyboard::Equal)
 			solver->updateMass(k);
 			
@@ -167,7 +167,7 @@ public:
 	 * processes a pixel in straight way. the point splits to the calculated positions
 	*/
 	void processPoint(unsigned x, unsigned y) {
-		double magnification[2] {1, 1};
+		float magnification[2] {1, 1};
         std::array<Point, 2> imagePositions = solver->processPoint(x * scale, y * scale, magnification);
 
 		auto color = getSourceColor(x, y);
@@ -185,7 +185,7 @@ public:
 	 * processes a pixel in straight way without magnification
 	*/
 	void processPointWithoutMagn(unsigned x, unsigned y) {
-		double magnification[2] {1, 1};
+		float magnification[2] {1, 1};
         std::array<Point, 2> imagePositions = solver->processPoint(x * scale, y * scale, magnification);
 
 		auto color = getSourceColor(x, y);
@@ -219,7 +219,7 @@ public:
 		float m = 1.0;
 		auto p = solver->reverseProcessPoint(x * scale, y * scale, m) / scale;
 		auto color = getSourceColor(p.x, p.y);
-		
+	
 		setPixelColor(x, y, color, 1);
 	}
 

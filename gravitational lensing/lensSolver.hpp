@@ -5,28 +5,28 @@
 #include "math.hpp"
 
 struct Lens {
-    double mass;                    // mass of the lens in kg
-    double z;                       // redshift of the lens
+    float mass;                    // mass of the lens in kg
+    float z;                       // redshift of the lens
     Point center;                   // center of the lens in radians
 };
 
 struct Source {
-    double z;                       // redshift of the source
+    float z;                       // redshift of the source
 };
 
 class LensSolver {
 protected:
     Lens lens;                      // lens in the system
     Source source;                  // source in the system
-    double einstAngle;              // einstein angle of the system in radians
+    float einstAngle;              // einstein angle of the system in radians
 
     /**
      * @return calculated einstein angle for the system in radians
     */
-    double einsteinAngle() {
-        double D_ls = angularDiameterDistanceBetween(lens.z, source.z);
-        double D_s = angularDiameterDistance(source.z);
-        double D_l = angularDiameterDistance(lens.z);
+    float einsteinAngle() {
+        float D_ls = angularDiameterDistanceBetween(lens.z, source.z);
+        float D_s = angularDiameterDistance(source.z);
+        float D_l = angularDiameterDistance(lens.z);
         return std::sqrt(4 * G0 * lens.mass * D_ls / D_s / D_l / 3 / 1e7) / c0;
     }
 
@@ -38,7 +38,7 @@ public:
      * @param x initial horizontal coordinate of the lens in radians
      * @param y initial vertical coordinate of the lens in radians
     */
-    LensSolver(double mass, double z1, double z2, double x=0, double y=0): lens{mass, z1, Point(x, y)}, source{z2} {
+    LensSolver(float mass, float z1, float z2, float x=0, float y=0): lens{mass, z1, Point(x, y)}, source{z2} {
         einstAngle = einsteinAngle();
     }
     LensSolver(LensSolver&) = default;
@@ -51,7 +51,7 @@ public:
      * 
      * @return the magnification (absolute value)
 	*/
-    float magnification(double angle) {
+    float magnification(float angle) {
         return std::abs(1 / (1 - std::pow(angle / einstAngle, -4)));
     }
 
@@ -63,18 +63,18 @@ public:
      * 
      * @return two refracted points
 	*/
-    std::array<Point, 2> processPoint(Point p, double *magn) {
+    std::array<Point, 2> processPoint(Point p, float *magn) {
         auto dp = p - lens.center;
         auto beta2 = dp * dp;
         auto beta = std::sqrt(beta2);
-        double angle1 = (beta + std::sqrt(beta2 + 4 * std::pow(einstAngle, 2))) / 2;
-        double angle2 = std::abs(beta - std::sqrt(beta2 + 4 * std::pow(einstAngle, 2))) / 2;
+        float angle1 = (beta + std::sqrt(beta2 + 4 * std::pow(einstAngle, 2))) / 2;
+        float angle2 = std::abs(beta - std::sqrt(beta2 + 4 * std::pow(einstAngle, 2))) / 2;
         
         Point imagePos1 = dp * angle1 / beta + lens.center;
         Point imagePos2 = dp * (-angle2) / beta + lens.center;
         std::array<Point, 2> imagePositions = {imagePos1, imagePos2};
 
-        double magn_[2] {magnification(angle1), magnification(angle2)};
+        float magn_[2] {magnification(angle1), magnification(angle2)};
 
         *magn = *magn_;
         for (int i = 0; i < 2; i++)
@@ -87,7 +87,7 @@ public:
      * 
      * @overload
 	*/
-    std::array<Point, 2> processPoint(double x, double y, double *magn) {
+    std::array<Point, 2> processPoint(float x, float y, float *magn) {
         return processPoint(Point(x, y), magn);
     }
 
@@ -112,7 +112,7 @@ public:
      * 
      * @overload
 	*/
-    Point reverseProcessPoint(double x, double y, float &magn) {
+    Point reverseProcessPoint(float x, float y, float &magn) {
         return reverseProcessPoint(Point(x, y), magn);
     }
 
@@ -122,7 +122,7 @@ public:
      * @param dx the horizontal move in radians
      * @param dy the vertical move in radians
     */
-    void moveLens(double dx, double dy) {
+    void moveLens(float dx, float dy) {
         lens.center += Point(dx, dy);
     }
 
@@ -132,7 +132,7 @@ public:
      * @param x the horizontal coordinate of center in radians
      * @param y the vertical coordinate of center in radians
     */
-    void setLensCenter(double x, double y) {
+    void setLensCenter(float x, float y) {
         lens.center = Point(x, y);
     }
 
@@ -146,28 +146,28 @@ public:
     /**
      * @return einstein angle of the system in radians
     */
-    double getEinstainAngle() {
+    float getEinstainAngle() {
         return einstAngle;
     }
 
     /**
      * @return the lens mass in kg
     */
-    double getMass() {
+    float getMass() {
         return lens.mass;
     }
 
     /**
      * @return redshift of the lens
     */
-    double getLensRedshift() {
+    float getLensRedshift() {
         return lens.z;
     }
 
     /**
      * @return redshift of the source
     */
-    double getSourceRedshift() {
+    float getSourceRedshift() {
         return source.z;
     }
 
@@ -176,8 +176,8 @@ public:
      * 
      * @param k mass change parameter (newMass = 10^k * oldMass)
     */
-    void updateMass(double k) {
+    void updateMass(float k) {
         lens.mass *= std::pow(10, k);
-        einstAngle *= std::pow(10, (double)k / 2);
+        einstAngle *= std::pow(10, (float)k / 2);
     }
 };
