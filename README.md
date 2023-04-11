@@ -12,4 +12,4 @@
 * [**Fred's aerodynamic (velocity)**](https://youtu.be/XSIdefUJJ98)
 
 **microproject**
-* [**Gravitational lensing presentation**](https://youtu.be/nmlw9BvqGDM)
+* [**gravitational lensing presentation**](https://youtu.be/nmlw9BvqGDM)
