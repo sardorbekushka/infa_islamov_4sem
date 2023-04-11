@@ -3,6 +3,7 @@
 It is a model of strong gravitational lensing in the point source and point lens approximations. 
 Each point is considered as a separate source refracted by massive object. For rendering was used SFML graphic library.
 
+- [Video presentation of the project](https://youtu.be/nmlw9BvqGDM)
 ### Required
 - C++ compiler (was tested on C++17 standart)
 - [SFML](https://www.sfml-dev.org/) (SFML 2.5.1 stable version was used)
