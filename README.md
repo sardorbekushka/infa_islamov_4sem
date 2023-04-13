@@ -10,3 +10,6 @@
 **lab3 (FEniCSx)**
 * [**Fred's aerodynamic (pressure)**](https://youtu.be/B29gHbTuGYo)
 * [**Fred's aerodynamic (velocity)**](https://youtu.be/XSIdefUJJ98)
+
+**microproject**
+* [**gravitational lensing presentation**](https://youtu.be/nmlw9BvqGDM)
