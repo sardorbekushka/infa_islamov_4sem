@@ -19,12 +19,18 @@ There are some examples of result model
 
 <img src="./output_images/RunningManNebula.jpeg" alt="Lensing of Running Man Nebula" width="50%" height="" title="Lensing of Running Man Nebula">
 
-And some tips about using. To compile and run code execute `complile.sh` file in this directory or use following expression 
+And some tips about using. To compile and run code 
+ - on macOS execute `complile.sh` file in this directory or use following expression 
     
-    g++ -std=c++17 main.cpp -I/opt/local/include/ /opt/local/lib/libsfml-graphics.dylib /opt/local/lib/libsfml-audio.dylib  /opt/local/lib/libsfml-window.dylib /opt/local/lib/libsfml-system.dylib -Ofast -lgsl -lcblas -o main
+        g++ -std=c++17 main.cpp -I/opt/local/include/ /opt/local/lib/libsfml-graphics.dylib /opt/local/lib/libsfml-audio.dylib  /opt/local/lib/libsfml-window.dylib /opt/local/lib/libsfml-system.dylib -Ofast -lgsl -lcblas -o main
 
-    ./main
+        ./main
 
+- on Linux use 
+ 
+        g++ main.cpp -Ofast -lgsl -lblas -lsfml-system -lsfml-audio -lsfml-graphics -lsfml-window -o main
+
+        ./main 
 ### Control
 
 | Command |              Action            |
