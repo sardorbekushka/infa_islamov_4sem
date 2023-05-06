@@ -5,7 +5,7 @@
 #include "math.hpp"
 
 struct Lens {
-    float mass;                    // mass of the lens in kg
+    double mass;                    // mass of the lens in kg
     float z;                       // redshift of the lens
     Point center;                   // center of the lens in radians
 };
@@ -27,7 +27,7 @@ protected:
         float D_ls = angularDiameterDistanceBetween(lens.z, source.z);
         float D_s = angularDiameterDistance(source.z);
         float D_l = angularDiameterDistance(lens.z);
-        return std::sqrt(4 * G0 * lens.mass * D_ls / D_s / D_l / 3 / 1e7) / c0;
+        return std::sqrt(4 * G0 * lens.mass * D_ls / D_s / D_l / 3e19) / c0;
     }
 
 public:
@@ -38,7 +38,7 @@ public:
      * @param x initial horizontal coordinate of the lens in radians
      * @param y initial vertical coordinate of the lens in radians
     */
-    LensSolver(float mass, float z1, float z2, float x=0, float y=0): lens{mass, z1, Point(x, y)}, source{z2} {
+    LensSolver(double mass, float z1, float z2, float x=0, float y=0): lens{mass, z1, Point(x, y)}, source{z2} {
         einstAngle = einsteinAngle();
     }
     LensSolver(LensSolver&) = default;
@@ -153,7 +153,7 @@ public:
     /**
      * @return the lens mass in kg
     */
-    float getMass() {
+    double getMass() {
         return lens.mass;
     }
 
