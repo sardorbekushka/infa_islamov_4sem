@@ -136,7 +136,7 @@ protected:
 		int idx = filename.find("-");
     	ss << filename.substr(0, idx) + "-";
     	ss << std::stoi(filename.substr(idx + 1, filename.length() - idx - 4)) + 1;
-		image.saveToFile(directory + ss.str() + ".png");
+		image.saveToFile(ss.str() + ".png");
 
 		return image;
 	}
