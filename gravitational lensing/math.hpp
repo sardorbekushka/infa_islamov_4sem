@@ -3,7 +3,9 @@
 #include "constants.hpp"
 #include <gsl/gsl_integration.h>
 
-
+/**
+ * @return the hubble constant in km/s * Mpc
+*/
 double hubbleConstant(double z, void *params) {
     double alpha = *(double *) params;
     return 1 / (H0 * std::sqrt(omegaM * std::pow(1 + z, alpha)) + omegaL);
