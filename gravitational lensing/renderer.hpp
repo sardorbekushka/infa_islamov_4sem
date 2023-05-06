@@ -5,10 +5,19 @@
 #include <SFML/Graphics.hpp>
 #include "lensSolver.hpp"
 #include <sstream>
+#include <filesystem>
 
+namespace fs = std::filesystem;
 
-class Renderer final {
-private:
+std::string lastFile(std::string directory) {
+	std::string name;
+	for (const auto & entry : fs::directory_iterator(directory))
+		if (name == "") name = entry.path();
+	return name;
+}
+
+class Renderer {
+protected:
     sf::RenderWindow window;			// the window where render is going
     sf::Image source;					// source image that will be refracted
     unsigned width, height;				// width and height of the window
@@ -16,6 +25,8 @@ private:
 	sf::Uint8 *pixels = nullptr;		// array with information about pixels color
 	double scale;						// scale param (ratio of real size to the number of pixels in window)
 	bool showMagnification;				// flag shows if magnification will be shown
+	bool hideInfo; 						// flag shows if model info will be hidden
+	int dx, dy;
 
 	/**
 	 * checks if the point belongs to the window
@@ -57,7 +68,7 @@ private:
 		for (int i = 0; i < 3; i++) {
 			int colorComponent = newColor[i] * m;
 			newColor[i] = colorComponent > 255 ? 255 : colorComponent;
-			pixels[4 * (width * y + x) + i] = newColor[i];
+			pixels[4 * (width * (y-dy) + x-dx) + i] = newColor[i];
 		}
 	}
 
@@ -86,18 +97,62 @@ private:
 		else if (event.key.code == sf::Keyboard::Down)
 			solver->moveLens(0, delta);
 
-		float k = 0.1;
+		// float k = 0.1;
 		if (event.key.code == sf::Keyboard::Equal)
-			solver->updateMass(k);
+			solver->updateMass(massSHIFT);
 			
 		else if (event.key.code == sf::Keyboard::BackSpace)
-			solver->updateMass(-k);
+			solver->updateMass(-massSHIFT);
 
-		if (event.key.code == sf::Keyboard::Enter) 
+		int kx = 0;
+		int ky = 0;
+		if (event.key.code == sf::Keyboard::D)
+			kx = -1;
+		else if (event.key.code == sf::Keyboard::A)
+			kx = 1;
+		if (event.key.code == sf::Keyboard::S)
+			ky = -1;
+		else if (event.key.code == sf::Keyboard::W)
+			ky = 1;
+		dx += kx * SHIFT;
+		dy += ky * SHIFT;
+		solver->moveLens(kx * delta, ky * delta);
+
+		if (event.key.code == sf::Keyboard::Space) 
 			showMagnification = !showMagnification;
+		if (event.key.code == sf::Keyboard::H) 
+			hideInfo = !hideInfo;
+		if (event.key.code == sf::Keyboard::Enter)
+			saveImage(saveImagesDirectory);
+	}
+
+	sf::Image saveImage(std::string directory) {
+		std::stringstream ss;
+		sf::Texture texture;
+		texture.create(width, height);
+		texture.update(window); 
+    	sf::Image image = texture.copyToImage();
+		std::string filename = lastFile(directory);
+		int idx = filename.find("-");
+    	ss << filename.substr(0, idx) + "-";
+    	ss << std::stoi(filename.substr(idx + 1, filename.length() - idx - 4)) + 1;
+		image.saveToFile(directory + ss.str() + ".png");
+
+		return image;
 	}
 
 public: 
+	Renderer(LensSolver *solver, sf::Image source, float realWidth, std::string title): solver(solver), source(source), showMagnification(true),
+																						height(source.getSize().y), width(source.getSize().x),
+																						scale(realWidth * 4.8481e-6 / source.getSize().x), dx(0), dy(0)
+	{
+		if (solver->getEinstainAngle() / scale > std::min(height, width)) 
+			std::cerr << "Warning! The lens too big for the image." << std::endl;
+
+		solver->setLensCenter(width / 2 * scale, height / 2 * scale);
+		pixels = new sf::Uint8[width * height * 4];
+		window.create(sf::VideoMode(width, height), title);																							
+	}
 	/**
 	 * @param solver pointer to the LensSolver object
 	 * @param filename the path to the file with image for background (source)
@@ -106,14 +161,15 @@ public:
 	 * 
 	 * @throw std::runtime_error is thrown if the 'filename' couldn't be open
 	*/
-    Renderer(LensSolver *solver , std::string filename, float realWidth, std::string title): solver(solver), showMagnification(true)
+
+    Renderer(LensSolver *solver, std::string filename, float realWidth, std::string title): solver(solver), showMagnification(true), dx(0), dy(0)
     {
 		if (!source.loadFromFile(filename))
     		throw std::runtime_error("Failed to open file.");
 
 		height = source.getSize().y;
 		width = source.getSize().x;
-		scale = realWidth * 485e-8 / width;
+		scale = realWidth * 4.8481e-6 / width;
 
 		if (solver->getEinstainAngle() / scale > std::min(height, width)) 
 			std::cerr << "Warning! The lens too big for the image." << std::endl;
@@ -134,7 +190,6 @@ public:
 	 * @param filename the name of the file with image for background (source)
 	*/
 	Renderer(LensSolver *solver, std::string filename): Renderer(solver, filename, 180, "Gravitational lens model") {}
-
 	/**
 	 * processes an image in straight way. each point in source splits to the calculated positions
 	*/
@@ -156,11 +211,11 @@ public:
 		if (showMagnification)
 			for (unsigned y = 0; y < height; y++)
 				for (unsigned x = 0; x < width; x++) 
-					reverseProcessPoint(x, y);
+					reverseProcessPoint(x + dx, y + dy);
 		else
 			for (unsigned y = 0; y < height; y++)
 				for (unsigned x = 0; x < width; x++) 
-					reverseProcessPointWithoutMagn(x, y);
+					reverseProcessPointWithoutMagn(x + dx, y + dy);
 	}
 
 	/**
@@ -239,7 +294,6 @@ public:
 
         sf::Texture texture;
         texture.create(width, height);
-
         sf::Sprite sprite;
 
 		sf::Clock clock;
@@ -255,10 +309,11 @@ public:
 		std::ostringstream scale_;
 		std::ostringstream omegaM_;
 		std::ostringstream omegaL_;
-		
+		std::ostringstream einstAngle_;
 		sourceZ << solver->getSourceRedshift();
 		lensZ << solver->getLensRedshift();
 		mass << solver->getMass();
+		einstAngle_ << solver->getEinstainAngle();
 
 		scale_ << scale;
 		omegaM_ << omegaM;
@@ -286,6 +341,8 @@ public:
 					(*this.*update)();
 					mass.str("");
 					mass << solver->getMass();
+					einstAngle_.str("");
+					einstAngle_ << solver->getEinstainAngle();
 				}
                 else if (sf::Mouse::isButtonPressed(sf::Mouse::Left)){
 					mouseHandle();
@@ -301,8 +358,10 @@ public:
 
 			precText.setString(modelInfo +  '\n' + \
 							   "lens mass: " + mass.str() + " kg" + '\n' + \
+							   "einstain angle: " + einstAngle_.str() + " rad\n" + \
 							   "FPS: " + std::to_string(1 / currentTtime) + '\n' \
 							    );
+			if (hideInfo) precText.setString("");
 			precText.setPosition(sf::Vector2f(10, 0));
 			window.draw(precText);	
             
