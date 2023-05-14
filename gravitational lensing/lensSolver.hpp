@@ -27,7 +27,7 @@ protected:
         float D_ls = angularDiameterDistanceBetween(lens.z, source.z);
         float D_s = angularDiameterDistance(source.z);
         float D_l = angularDiameterDistance(lens.z);
-        return std::sqrt(4 * G0 * lens.mass * D_ls / D_s / D_l / 3e19) / c0;
+        return std::sqrt(4 * G0 * lens.mass * D_ls / D_s / D_l / 3e19 * std::sqrt(2.5)) / c0;
     }
 
 public:
@@ -38,7 +38,7 @@ public:
      * @param x initial horizontal coordinate of the lens in radians
      * @param y initial vertical coordinate of the lens in radians
     */
-    LensSolver(double mass, float z1, float z2, float x=0, float y=0): lens{mass, z1, Point(x, y)}, source{z2} {
+    LensSolver(double mass, float z1, float z2, double x=0, double y=0): lens{mass, z1, Point(x, y)}, source{z2} {
         einstAngle = einsteinAngle();
     }
     LensSolver(LensSolver&) = default;

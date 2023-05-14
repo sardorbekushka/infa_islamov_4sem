@@ -29,12 +29,11 @@ class FitRenderer: public Renderer {
     sf::Image background;
 	bool showBackground;
 public:
-    FitRenderer(LensSolver *solver, sf::Image source, float realWidth, std::string backgroundImage, std::string title): Renderer(solver, source, realWidth, title), 
+    FitRenderer(LensSolver *solver, sf::Image source, float realWidth, int dx, int dy, std::string backgroundImage, std::string title): Renderer(solver, source, realWidth, dx, dy, title), 
 																														showBackground(true)
     {
         if (!background.loadFromFile(backgroundImage))
     		throw std::runtime_error("Failed to open file.");
-        // background.createMaskFromColor(background.getPixel(1, 1));
     }
 
 	void keyboardHandle(sf::Event event) {
@@ -59,7 +58,7 @@ public:
         sf::Texture backTexture;
         backTexture.create(width, height);
         sf::Sprite backSprite;
-        backSprite.setScale(width / background.getSize().x, height / background.getSize().y);
+        backSprite.setScale(width / background.getSize().x * 1.04, height / background.getSize().y * 1.04);
         backSprite.setColor(sf::Color(255, 255, 255, 100));
 		sf::Image image;
 
@@ -148,18 +147,25 @@ public:
 };
 
 int main() {
-    double mass = 2.5e41;
     float z1 = 0.227;
     float z2 = 0.9313;
     float width = 2.4241e-5;
     float height = 2.4241e-5;
+	float realWidth = 5;
     unsigned heightPix = 500;
     unsigned widthPix = 500;
+	double lensX = 1.149e-05;
+	double lensY = 1.35262e-05;
+	int sourceX = -11;
+	int sourceY = 24;
 
-    auto solver = new LensSolver(mass, z1, z2, width/2, height/2);
 	std::string background = "output_images/mask.png";
-    FitRenderer renderer(solver, createSource(widthPix, heightPix, widthPix/2+27, heightPix/2-27, 15), 5, background, "");
-    int code = renderer.poll();
-    delete solver;
-    return code;
+
+	for (double mass = 2.4e41; mass < 2.75e41; mass*=1.01) {
+		auto solver = new LensSolver(mass, z1, z2, lensX, lensY);
+    	FitRenderer renderer(solver, createSource(widthPix, heightPix, widthPix/2, heightPix/2, 15), realWidth, sourceX, sourceY, background, "");
+    	int code = renderer.poll();
+    	delete solver;
+	}
+    return 0;
 }
