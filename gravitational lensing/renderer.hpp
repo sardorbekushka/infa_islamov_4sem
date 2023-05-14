@@ -78,14 +78,14 @@ protected:
     void mouseHandle() {
 		sf::Vector2i posPixel = sf::Mouse::getPosition(window);
 		sf::Vector2f pos = window.mapPixelToCoords(posPixel);
-		solver->setLensCenter(pos.x * scale, pos.y * scale);
+		solver->setLensCenter(pixToRad(pos.x), pixToRad(pos.y));
 	}
 
 	/**
 	 * Handles keyboard events. Can move the lens, change lens mass and switch the magnication mode
 	*/
     void keyboardHandle(sf::Event event) {
-		float delta = SHIFT * scale;
+		float delta = pixToRad(SHIFT);
 
 		if (event.key.code == sf::Keyboard::Right)
 			solver->moveLens(delta, 0);
@@ -123,7 +123,7 @@ protected:
 		if (event.key.code == sf::Keyboard::H) 
 			hideInfo = !hideInfo;
 		if (event.key.code == sf::Keyboard::Enter)
-			saveImage(saveImagesDirectory);
+			saveImageInfo(saveImagesDirectory);
 	}
 
 	sf::Image saveImage(std::string directory) {
@@ -141,15 +141,44 @@ protected:
 		return image;
 	}
 
+	sf::Image saveImageInfo(std::string directory) {
+		std::stringstream ss;
+		sf::Texture texture;
+		texture.create(width, height);
+		texture.update(window); 
+    	sf::Image image = texture.copyToImage();
+		auto p = solver->getLensCenter();
+		ss << directory << "lens_" << p.x << '_' << p.y
+						<< "_source_" << dx << '_' << dy 
+						<< "_mass_" << solver->getMass() << ".png";
+		image.saveToFile(ss.str());
+
+		return image;
+	}
+
+	double pixToRad(int pix) {
+		return pix * scale;
+	}
+
+	double radToPix(double rad) {
+		return rad / scale;
+	}
+
+	Point radToPix(Point rad) {
+		return rad / scale;
+	}
+
+	Point pixToRad(Point pix) {
+		return pix * scale;
+	}
 public: 
-	Renderer(LensSolver *solver, sf::Image source, float realWidth, std::string title): solver(solver), source(source), showMagnification(true),
+	Renderer(LensSolver *solver, sf::Image source, float realWidth, int dx=0, int dy=0, std::string title="gravitation lensing"): solver(solver), source(source), showMagnification(true),
 																						height(source.getSize().y), width(source.getSize().x),
-																						scale(realWidth * 4.8481e-6 / source.getSize().x), dx(0), dy(0)
+																						scale(realWidth * 4.8481e-6 / source.getSize().x), dx(dx), dy(dy)
 	{
-		if (solver->getEinstainAngle() / scale > std::min(height, width)) 
+		if (radToPix(solver->getEinstainAngle()) > std::min(height, width)) 
 			std::cerr << "Warning! The lens too big for the image." << std::endl;
 
-		solver->setLensCenter(width / 2 * scale, height / 2 * scale);
 		pixels = new sf::Uint8[width * height * 4];
 		window.create(sf::VideoMode(width, height), title);																							
 	}
@@ -171,10 +200,9 @@ public:
 		width = source.getSize().x;
 		scale = realWidth * 4.8481e-6 / width;
 
-		if (solver->getEinstainAngle() / scale > std::min(height, width)) 
+		if (radToPix(solver->getEinstainAngle()) > std::min(height, width)) 
 			std::cerr << "Warning! The lens too big for the image." << std::endl;
 
-		solver->setLensCenter(width / 2 * scale, height / 2 * scale);
 		pixels = new sf::Uint8[width * height * 4];
 		window.create(sf::VideoMode(width, height), title);
     }
@@ -190,6 +218,7 @@ public:
 	 * @param filename the name of the file with image for background (source)
 	*/
 	Renderer(LensSolver *solver, std::string filename): Renderer(solver, filename, 180, "Gravitational lens model") {}
+	
 	/**
 	 * processes an image in straight way. each point in source splits to the calculated positions
 	*/
@@ -223,11 +252,11 @@ public:
 	*/
 	void processPoint(unsigned x, unsigned y) {
 		float magnification[2] {1, 1};
-        std::array<Point, 2> imagePositions = solver->processPoint(x * scale, y * scale, magnification);
+        std::array<Point, 2> imagePositions = solver->processPoint(pixToRad(x), pixToRad(y), magnification);
 
 		auto color = getSourceColor(x, y);
 		for (int i = 0; i < 2; i++) {
-			auto p = imagePositions[i] / scale;
+			auto p = radToPix(imagePositions[i]);
 			auto m = magnification[i];
 			if (!checkPoint(p.x, p.y)) 							
 				return;
@@ -241,11 +270,11 @@ public:
 	*/
 	void processPointWithoutMagn(unsigned x, unsigned y) {
 		float magnification[2] {1, 1};
-        std::array<Point, 2> imagePositions = solver->processPoint(x * scale, y * scale, magnification);
+        std::array<Point, 2> imagePositions = solver->processPoint(pixToRad(x), pixToRad(y), magnification);
 
 		auto color = getSourceColor(x, y);
 		for (int i = 0; i < 2; i++) {
-			auto p = imagePositions[i] / scale;
+			auto p = radToPix(imagePositions[i]);
 			if (!checkPoint(p.x, p.y)) 							
 				return;
 
@@ -259,7 +288,7 @@ public:
 	void reverseProcessPoint(unsigned x, unsigned y) {
 		float magnification = 1.0;
 		float &m = magnification;
-		auto p = solver->reverseProcessPoint(x * scale, y * scale, m) / scale;
+		auto p = radToPix(solver->reverseProcessPoint(pixToRad(x), pixToRad(y), m));
 		auto color = getSourceColor(p.x, p.y);
 		
 		m = (m > 2) ? 2 : (m < 0.25) ? 0.25 : m;
@@ -272,7 +301,7 @@ public:
 	*/
 	void reverseProcessPointWithoutMagn(unsigned x, unsigned y) {
 		float m = 1.0;
-		auto p = solver->reverseProcessPoint(x * scale, y * scale, m) / scale;
+		auto p = radToPix(solver->reverseProcessPoint(pixToRad(x), pixToRad(y), m));
 		auto color = getSourceColor(p.x, p.y);
 	
 		setPixelColor(x, y, color, 1);
