@@ -22,7 +22,7 @@ img = cv2.resize(img0, (500,500), interpolation=cv2.INTER_CUBIC)
 ret, mask = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
 
 
-path=Path("output_images/fitImages_v2")
+path=Path("output_images/fitImages")
 
 #read generated images
 masses= []
@@ -55,8 +55,10 @@ for i in range(arg):
 for i in range(arg, xs.size):
     if (ys[i] <= diff) and (ys[i-1] >= diff):
         x2 = (diff-ys[i-1])/(ys[i]-ys[i-1])*(xs[i]-xs[i-1])+xs[i-1]
-d1 = xs[arg]-x1
-d2 = x2-xs[arg]
+
+dr = 0.015 * xs[arg]
+d1 = xs[arg]-x1 + dr
+d2 = x2-xs[arg] + dr
 
 
 fig, ax = plt.subplots()
@@ -64,8 +66,10 @@ ax.plot(xs,ys)
 ax.errorbar(xs[arg], ys[arg]+0.003, xerr=[[d1],[d2]], fmt='ro', ecolor = 'red', capsize= 3)
 norm = ax.get_ybound()[1]-ax.get_ybound()[0]
 ax.axvline(x = xs[arg], ymax = (ys[arg]-ax.get_ybound()[0])/norm, color = 'red',  linestyle = '--')
-ax.axvline(x = x1, ymax = (diff-ax.get_ybound()[0])/norm, color = 'red',  linestyle = '--')
-ax.axvline(x = x2, ymax = (diff-ax.get_ybound()[0])/norm, color = 'red',  linestyle = '--')
+ax.axvline(x = xs[arg] - d1, ymax = (99.887-ax.get_ybound()[0])/norm, color = 'red',  linestyle = '--')
+# ax.axvline(x = xs[arg] - d1, ymax = (diff-ax.get_ybound()[0])/norm, color = 'red',  linestyle = '--')
+ax.axvline(x = xs[arg] + d2, ymax = (99.895-ax.get_ybound()[0])/norm, color = 'red',  linestyle = '--')
+# ax.axvline(x = xs[arg] + d2, ymax = (diff-ax.get_ybound()[0])/norm, color = 'red',  linestyle = '--')
 ax.set_xlabel(xlabel=r'Mass, $10^{11}M_{\odot}$', math_fontfamily='cm')
 ax.set_ylabel(ylabel=r'Match, $\%$', math_fontfamily='cm')
 

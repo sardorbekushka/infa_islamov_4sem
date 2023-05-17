@@ -36,13 +36,21 @@ public:
     		throw std::runtime_error("Failed to open file.");
     }
 
-	void keyboardHandle(sf::Event event) {
+	void keyboardHandle(sf::Event event, double maxMass, double step) {
 		Renderer::keyboardHandle(event);
+
+		if (event.key.code == sf::Keyboard::Tab){
+			if (solver->getMass() > maxMass)
+				return;	
+			saveImageInfo(saveImagesDirectory);
+			solver->updateMass(step);
+			}
+
 		if (event.key.code == sf::Keyboard::K)
 			showBackground = !showBackground; 
 	}
 
-    int poll() {
+    int poll(double maxMass, double step) {
         sf::Font font;
 		font.loadFromFile(fontName);
 
@@ -59,11 +67,11 @@ public:
         backTexture.create(width, height);
         sf::Sprite backSprite;
         backSprite.setScale(width / background.getSize().x * 1.04, height / background.getSize().y * 1.04);
-        backSprite.setColor(sf::Color(255, 255, 255, 100));
+        backSprite.setColor(sf::Color(255, 255, 255, 150));
 		sf::Image image;
 
 		sf::Clock clock;
-		float currentTtime;
+		float currentTime;
 		window.setFramerateLimit(FPS);
 
 		void (Renderer::*update)();
@@ -94,7 +102,7 @@ public:
 
 		while (window.isOpen())
     	{
-			currentTtime = clock.restart().asSeconds();
+			currentTime = clock.restart().asSeconds();
 			sf::Event event;
 
 			while (window.pollEvent(event))
@@ -103,7 +111,7 @@ public:
 					window.close();
 				else if (event.type == sf::Event::KeyPressed)
 				{
-					keyboardHandle(event);
+					keyboardHandle(event, maxMass, step);
 					(*this.*update)();
 					mass.str("");
 					mass << solver->getMass();
@@ -134,7 +142,7 @@ public:
 			precText.setString(modelInfo +  '\n' + \
 							   "lens mass: " + mass.str() + " kg" + '\n' + \
 							   "einstain angle: " + einstAngle_.str() + " rad\n" + \
-							   "FPS: " + std::to_string(1 / currentTtime) + '\n' \
+							   "FPS: " + std::to_string(1 / currentTime) + '\n' \
 							    );
 			if (hideInfo) precText.setString("");
 			precText.setPosition(sf::Vector2f(10, 0));
@@ -158,14 +166,14 @@ int main() {
 	double lensY = 1.35262e-05;
 	int sourceX = -11;
 	int sourceY = 24;
-
-	std::string background = "output_images/mask.png";
-
-	for (double mass = 2.4e41; mass < 2.75e41; mass*=1.01) {
-		auto solver = new LensSolver(mass, z1, z2, lensX, lensY);
-    	FitRenderer renderer(solver, createSource(widthPix, heightPix, widthPix/2, heightPix/2, 15), realWidth, sourceX, sourceY, background, "");
-    	int code = renderer.poll();
-    	delete solver;
-	}
-    return 0;
+	double minMass = 2.2e41;
+	double maxMass = 2.8e41;
+	double step = 4e-3;
+	std::string background = "output_images/lens.png";
+	
+	auto solver = new LensSolver(minMass, z1, z2, lensX, lensY);
+	FitRenderer renderer(solver, createSource(widthPix, heightPix, widthPix/2, heightPix/2, 15), realWidth, sourceX, sourceY, background, "");
+	int code = renderer.poll(maxMass, step);
+	delete solver;
+    return code;
 }
