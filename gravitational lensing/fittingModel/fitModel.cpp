@@ -1,6 +1,6 @@
 #include <iostream>
-#include "lensSolver.hpp"
-#include "renderer.hpp"
+#include "../lensSolver.hpp"
+#include "../renderer.hpp"
 
 sf::Image createSource(int width, int height, int x, int y, int r) {
     sf::RenderWindow window(sf::VideoMode(width, height), "source");
@@ -169,7 +169,7 @@ int main() {
 	double minMass = 2.2e41;
 	double maxMass = 2.8e41;
 	double step = 4e-3;
-	std::string background = "output_images/lens.png";
+	std::string background = "output_images/mask.png";
 	
 	auto solver = new LensSolver(minMass, z1, z2, lensX, lensY);
 	FitRenderer renderer(solver, createSource(widthPix, heightPix, widthPix/2, heightPix/2, 15), realWidth, sourceX, sourceY, background, "");

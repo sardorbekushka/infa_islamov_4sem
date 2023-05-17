@@ -80,11 +80,7 @@ props = dict(boxstyle='round', facecolor='white', alpha=0.5)
 ax.text(0.55, 0.17, textstr, transform=ax.transAxes, fontsize=14,
         verticalalignment='top', bbox=props, math_fontfamily='cm')
 ax.set_title('Searching for the best fit')
-#
-# for tick in ax.get_xticklabels():
-#     tick.set_fontname("Times New Roman")
-# for tick in ax.get_yticklabels():
-#     tick.set_fontname("Times New Roman")
+
 ax.grid()
 
 plt.show()
