@@ -65,7 +65,7 @@
 \end{titlepage}
 
 \subparagraph*{Аннотация.} В данной работе представлен алгоритм построения модели сильного гравитационного линзирования (далее ГЛ) с протяженным источником в приближении точечной линзы. 
-На основе построенной модели и открытых астрофизических баз данных и существующих публикаций проанализирована ГЛ система SDSS J0029-0055, определена масса линзы в ней: $M = 1.29^{+0.04}_{-0.03} \cdot 10^{11} M_\odot$.
+На основе построенной модели и открытых астрофизических баз данных и существующих публикаций проанализирована ГЛ система SDSS J0029-0055, определена масса линзы в ней: $M = 1.29^{+0.06}_{-0.05} \cdot 10^{11} M_\odot$.
 
 \section*{Теоретическое введение}
 \subparagraph*{Гравитационное линзирование.}
@@ -82,7 +82,7 @@
 \begin{wrapfigure}{r}{0.4\linewidth}
     \centering
     \includegraphics[width=\linewidth]{sources/scheme.png}
-    \caption{\small{Схема гравитационного линзирования}}
+    \caption{\small{Схема гравитационного линзирования \cite{gravlens_strong_weak_micro}}}
 \end{wrapfigure}  
 
 \vspace{1em}
@@ -141,7 +141,7 @@
 \begin{wrapfigure}{r}{0.4\linewidth}
     \centering
     \includegraphics[width=0.8\linewidth]{sources/imagesForm.png}
-    \caption{\small Относительные положения изображений $I_+$ и $I_-$, источника $S$ и линзы $M$ при гравитационном линзировании}   
+    \caption{\small Относительные положения изображений $I_+$ и $I_-$, источника $S$ и линзы $M$ при гравитационном линзировании \cite{narayan}}   
 \end{wrapfigure}
 
 Тогда выражение (1) принимает вид 
@@ -182,12 +182,12 @@
 \subparagraph*{Посик системы.} 
 \begin{wrapfigure}{r}{0.4\linewidth}
     \centering
-    \includegraphics[width=0.7\linewidth]{sources/sdssj0029-0055.png}
+    \includegraphics[width=0.9\linewidth]{sources/sdssj0029-0055.png}
     \caption{\small Изображение системы SDSS J0029-0055 в цветовой схеме viridis}
 \end{wrapfigure}
 Далеко не каждая система описывается рассматриваемым приближением точечной линзы: существует и множество других более сложных массивных объектов, как просто протяженных, так и вовсе не аксиально симметричных.
 Процесс линзирования такими телами проходит сильно сложнее, и результаты отличаются от приведенных ранее выкладок.
-По этой причине необходимо осуществить поиск системы, визуально подходящих под описанное приближение. 
+По этой причине необходимо осуществить поиск системы, визуально подходящей под описанное приближение. 
 Поиск систем и данных о них производился в открытых астрофизических базах данных, таких какс SIMBAD \cite{simbad}, архив изображений телескопа Hubble \cite{hubble}, каталог ESASky \cite{esasky}.
 
 В целях анализа была выбрана система SDSS J0029-0055 (SDSS - Sloan Digital Sky Survey).
@@ -196,17 +196,19 @@
 
 \subparagraph*{Анализ изображений.}
 Для анализа системы использовалась построенная модель. 
-В качестве параметров были указаны красные смещения рассматриваемой системы $z_1 = 0.227$ и $z_2 = 0.9313$.
+В качестве параметров были указаны красные смещения рассматриваемой системы $z_1 = 0.227$ и $z_2 = 0.9313$ \cite{redshift0029}.
 
 Для удобного сравнения реального изображения с полученными при моделировании создадим маску первого: значения пикселей с самими дугами, полученными в ходе линзирования, приравняем к единице, остальные занулим.
-Подобрав подходящие положения в системе источник - линза в модели будем генерировать аналогичные изображения при разных массах. 
-Для сравнения полученных изображений с маской, улучшим разрешение маски кубической интерполяцией. 
+Подобрав подходящие положения в системе источник - линза в модели будем генерировать аналогичные реальной системе изображения при разных массах. 
+Для сравнения полученных изображений с маской, улучшим ее разрешение кубической интерполяцией. 
 Теперь, имея изображения с одинаковым разрешением, определим количество несовпадающих пикселей. 
 Построим график процента совпадения изображений в зависимости от массы линзы. 
 Максимум будет соответствовать искомому значению. 
-Погрешность определяется выбором отличия процента совпадения на $0.02\%$ от максимальной величины.
 
-Вычисленные результаты можно видеть на Рис. 4
+Погрешность по результатам вычислений включает в себя массу, отличающуюся от искомой не более чем на $0.02\%$.
+Также дополнительно к этому возникает некоторая неточность при определении наилучшего положения источника, оцененная в $0.007''$, что при текущем значении радиуса Эйнштейна $\theta_E = 0.97''$ дает относительную погрешность $\varepsilon_{\theta} \approx 0.7\%$.
+Учитывая квадратичную зависимость массы линзы от радиуса Эйнштейна получаем дополнительно $\varepsilon_M \approx 1.4\%$.
+Результаты можно видеть на Рис. 4.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\linewidth]{sources/resultMass.eps}
@@ -215,31 +217,38 @@
 
 \section*{Заключение}
 В данной работе представлен алгоритм построения модели сильного гравитационного линзирования с протяженным источником в приближении точечной линзы. 
-На основе построенной модели и открытых астрофизических баз данных и существующих публикаций проанализирована ГЛ система SDSS J0029-0055, определена масса линзы в ней: $M = 1.29^{+0.04}_{-0.03}\ M_\odot$.
-Полученный результат хорошо согласуется с величиной, представленной в публикации Denzel et al. (2021) $M = 1.3^{+0.20}_{-0.22}\ M_\odot$.
+На основе построенной модели, открытых астрофизических баз данных и существующих публикаций проанализирована гравитационно-линзированная система SDSS J0029-0055, определена масса линзы в ней: $M = 1.29^{+0.06}_{-0.05}\cdot 10^{11}\ M_\odot$.
+Полученный результат хорошо согласуется с величиной, представленной в публикации Denzel et al. (2021) $M = 1.3^{+0.20}_{-0.22} \cdot 10^{11}\ M_\odot$ \cite{denzel}.
 Из этого можно заключить, что данная система хорошо описывается приближением точечной линзы.
-Также этим подтверждается корректность построенной модели и ее приенимость для анализа реальных систем.
+Также этим подтверждается корректность построенной модели и ее применимость для анализа реальных систем.
 
 \newpage
 
 \begin{thebibliography}{}
     \bibitem{gravlens_strong_weak_micro}
-    \href{https://extras.springer.com/?query=978-3-540-30309-1}{P. Schneider, C.S. Kochanek, J. Wambsganss, Gravitational Lensing: Strong, Weak and Micro, 2006}
+    \href{https://extras.springer.com/?query=978-3-540-30309-1}{P. Schneider, C.S. Kochanek, J. Wambsganss. Gravitational Lensing: Strong, Weak and Micro, 2006}
     
     \bibitem{meneghetti}
-    \href{https://ui.adsabs.harvard.edu/abs/2022iglp.book.....M/abstract}{M. Meneghetti, Introduction to Gravitational Lensing (Lecture scripts)}
+    \href{https://ui.adsabs.harvard.edu/abs/2022iglp.book.....M/abstract}{M. Meneghetti. Introduction to Gravitational Lensing (Lecture scripts), 2022}
 
     \bibitem{narayan}
-    \href{https://arxiv.org/abs/astro-ph/9606001}{R. Narayan, M. Bartellmann, Lectures on Gravitational Lensing}
-
+    \href{https://arxiv.org/abs/astro-ph/9606001}{R. Narayan, M. Bartelmann. Lectures on Gravitational Lensing, 1996}
+ 
     \bibitem{simbad}
-    \href{http://simbad.u-strasbg.fr/simbad/}{SIMBAD Astronomical Database}
+    \href{http://simbad.u-strasbg.fr/simbad/}{SIMBAD Astronomical Database, accessed: 17 May 2023}
 
     \bibitem{hubble}
-    \href{https://hla.stsci.edu/hlaview.html}{Hubble Legacy Archive}
+    \href{https://hla.stsci.edu/hlaview.html}{Hubble Legacy Archive, accessed: 17 May 2023}
 
     \bibitem{esasky}
-    \href{https://sky.esa.int}{ESASky catalog}
-\end{thebibliography}
+    \href{https://sky.esa.int}{ESASky catalog, accessed: 17 May 2023}
+
+    \bibitem{redshift0029}
+    \href{https://iopscience.iop.org/article/10.1086/589327/pdf}{A.S. Bolton, S. Burles, L.V.E. Koopmans, T. Treu, R. Gavazzi, L.A. Moustakas, R. Wayth, D.J. Schlegel. The Sloan Lens ACS Survey. V. The Full ACS Strong-Lens Sample, 2008}
+    
+    \bibitem{denzel}
+    \href{https://arxiv.org/pdf/2102.10114.pdf}{P. Denzel, S. Mukherjee, P. Saha. A new strategy for matching observed and simulated lensing galaxies, 2021}
+   
+    \end{thebibliography}
 
 \end{document}
