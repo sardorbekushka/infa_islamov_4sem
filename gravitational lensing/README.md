@@ -35,7 +35,7 @@ And some tips about using. To compile and run code
 
 | Command |              Action            |
 |---------|--------------------------------|
-|LMB Click|  Set the lens position         |
+|LMB Click| Set the lens position          |
 |LMB Drag | Lens is following the mouse    |
 |Arrows   | Move the lens in this direction|
 |WASD keys| Move the source                |
@@ -43,4 +43,6 @@ And some tips about using. To compile and run code
 |Backspace| Decrease the lens mass         |
 |Enter    | Make screenshot                |
 |Space    | Switch magnification show mode |
-|H        | Switch information show mode   |
+|Tab      | Save image and increase mass   |
+|H        | Hide or show info about system |
+|K        | Hide or show background image  |
